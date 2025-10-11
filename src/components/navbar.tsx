@@ -1,0 +1,369 @@
+"use client";
+
+import Link from "next/link";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { ChevronDown, Menu, Home, BookOpen, Users, GraduationCap, ShoppingBag, User, Settings, ShoppingCart, LogIn, LogOut } from "lucide-react";
+import Image from "next/image";
+import { useCart } from "@/contexts/cart-context";
+import { useAuth } from "@/contexts/auth-context";
+import { AuthModal } from "@/components/auth/auth-modal";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+export function Navbar() {
+  const { state } = useCart();
+  const { user, logout } = useAuth();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  
+  return (
+    <header className="bg-[#42403e] py-4 sticky top-0 z-50 shadow-lg">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between">
+          {/* Logo */}
+          <div className="flex items-center">
+            <Link href="/" className="flex group" aria-label="Ir al inicio">
+              <Image
+                src="/logo-blog.svg"
+                alt="brian-blog"
+                width={160}
+                height={45}
+                className="h-10 w-auto transition-transform duration-300 group-hover:scale-105"
+                priority
+              />
+            </Link>
+          </div>
+
+          {/* Navegación central */}
+          <nav className="hidden lg:flex items-center space-x-8" aria-label="Navegación principal">
+            <DesktopNav />
+          </nav>
+
+          {/* Carrito y acciones */}
+          <div className="flex items-center space-x-4">
+            {/* Carrito con indicador */}
+            <Link href="/carrito" className="relative p-2 text-white hover:text-gray-300 transition-colors">
+              <ShoppingCart className="h-6 w-6" />
+              {state.itemCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                  {state.itemCount}
+                </span>
+              )}
+            </Link>
+            
+            {/* Autenticación */}
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    className="text-white hover:text-[#D4AF37] hover:bg-white/5 transition-all duration-300 font-medium flex items-center gap-2 px-3 py-2"
+                  >
+                    <User className="h-4 w-4" />
+                    {user.name || user.email}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent 
+                  align="end" 
+                  className="w-56 bg-[#42403e] text-white border-gray-600 shadow-xl"
+                >
+                  <DropdownMenuItem className="hover:bg-white/10 cursor-pointer focus:bg-white/10 transition-colors">
+                    <Link href="/mi-cuenta" className="w-full flex items-center gap-2">
+                      <User className="h-4 w-4" />
+                      Mi cuenta
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="hover:bg-white/10 cursor-pointer focus:bg-white/10 transition-colors">
+                    <Link href="/dashboard" className="w-full flex items-center gap-2">
+                      <Settings className="h-4 w-4" />
+                      Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={logout}
+                    className="hover:bg-white/10 cursor-pointer focus:bg-white/10 transition-colors"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Cerrar sesión
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button 
+                onClick={() => setIsAuthModalOpen(true)}
+                variant="ghost" 
+                className="text-white hover:text-[#D4AF37] hover:bg-white/5 transition-all duration-300 font-medium flex items-center gap-2 px-3 py-2"
+              >
+                <LogIn className="h-4 w-4" />
+                Iniciar sesión
+              </Button>
+            )}
+            
+            {/* Texto de bienvenida más compacto */}
+            <p className="hidden xl:block text-white text-xs italic opacity-80 max-w-xs">
+              Blog sobre estoicismo y desarrollo personal
+            </p>
+          </div>
+
+          <div className="flex lg:hidden">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="text-white hover:bg-white/10 transition-colors"
+                  aria-label="Abrir menú de navegación"
+                >
+                  <Menu className="h-6 w-6" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent 
+                side="right" 
+                className="w-[320px] sm:w-[400px] p-0 bg-gradient-to-br from-[#42403e] to-[#36312f] border-l border-gray-600"
+                aria-label="Menú de navegación móvil"
+              >
+                <MobileSidebar />
+              </SheetContent>
+            </Sheet>
+          </div>
+        </div>
+      </div>
+      
+      {/* Modal de autenticación */}
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)} 
+      />
+    </header>
+  );
+}
+
+function DesktopNav() {
+  return (
+    <>
+      {/* Contenido Principal */}
+      <NavLink href="/" label="Inicio" />
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button 
+            variant="ghost" 
+            className="text-white hover:text-[#D4AF37] hover:bg-white/5 transition-all duration-300 font-medium flex items-center gap-1 px-2 py-1 text-sm relative group"
+            aria-label="Abrir menú del blog"
+          >
+            BLOG
+            <ChevronDown className="h-3 w-3 transition-transform group-data-[state=open]:rotate-180" />
+            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#D4AF37] transition-all duration-300 group-hover:w-full"></span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent 
+          align="end" 
+          className="w-56 bg-[#42403e] text-white border-gray-600 shadow-xl"
+          aria-label="Categorías del blog"
+        >
+          <DropdownMenuItem className="hover:bg-white/10 cursor-pointer focus:bg-white/10 transition-colors">
+            <Link href="/categoria/citas-estoicas" className="w-full flex items-center gap-2">
+              <BookOpen className="h-4 w-4" />
+              Citas estoicas
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="hover:bg-white/10 cursor-pointer focus:bg-white/10 transition-colors">
+            <Link href="/categoria/entrevistas" className="w-full flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              Entrevistas
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="hover:bg-white/10 cursor-pointer focus:bg-white/10 transition-colors">
+            <Link href="/categoria/principios-estoicos" className="w-full flex items-center gap-2">
+              <GraduationCap className="h-4 w-4" />
+              Principios estoicos
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="hover:bg-white/10 cursor-pointer focus:bg-white/10 transition-colors">
+            <Link href="/categoria/psicologia-estoica" className="w-full flex items-center gap-2">
+              <BookOpen className="h-4 w-4" />
+              Psicología estoica
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="hover:bg-white/10 cursor-pointer focus:bg-white/10 transition-colors">
+            <Link href="/categoria/general" className="w-full flex items-center gap-2">
+              <BookOpen className="h-4 w-4" />
+              General
+            </Link>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <NavLink href="/que-es-el-estoicismo" label="¿Qué es el estoicismo?" />
+      <NavLink href="/comunidad-estoica" label="Comunidad" />
+      
+      {/* Servicios */}
+      <NavLink href="/tienda" label="Tienda" />
+      
+      {/* Usuario */}
+      <NavLink href="/dashboard" label="Dashboard" />
+      <NavLink href="/mi-cuenta" label="Mi cuenta" />
+    </>
+  );
+}
+
+// Componente reutilizable para los enlaces del navbar con hover mejorado
+function NavLink({ href, label }: { href: string; label: string }) {
+  return (
+    <Link 
+      href={href} 
+      className="text-white hover:text-[#D4AF37] transition-all duration-300 font-medium relative group px-2 py-1 text-sm"
+    >
+      {label}
+      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#D4AF37] transition-all duration-300 group-hover:w-full"></span>
+    </Link>
+  );
+}
+
+function MobileSidebar() {
+  const { user, logout } = useAuth();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  return (
+    <div className="flex flex-col h-full">
+      {/* Header */}
+      <div className="flex items-center justify-between p-6 border-b border-gray-600/50">
+        <div className="flex items-center gap-3">
+          <Image
+            src="/logo-blog.svg"
+            alt="brian-blog"
+            width={120}
+            height={40}
+            className="h-8 w-auto"
+          />
+        </div>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 py-6 px-4 space-y-2 overflow-y-auto" aria-label="Navegación móvil">
+        <div className="space-y-1">
+          <NavItem href="/" icon={Home} label="Inicio" />
+          <NavItem href="/que-es-el-estoicismo" icon={BookOpen} label="¿Qué es el estoicismo?" />
+          <NavItem href="/comunidad-estoica" icon={Users} label="Comunidad" />
+        </div>
+
+        {/* Blog Section */}
+        <div className="pt-4">
+          <div className="flex items-center gap-2 px-3 py-2 text-[#D4AF37] font-semibold text-sm border-b border-gray-600/50 mb-3">
+            <BookOpen className="h-4 w-4" />
+            BLOG
+          </div>
+          <div className="pl-4 space-y-1">
+            <SubNavItem href="/categoria/citas-estoicas" label="Citas estoicas" />
+            <SubNavItem href="/categoria/entrevistas" label="Entrevistas" />
+            <SubNavItem href="/categoria/principios-estoicos" label="Principios estoicos" />
+            <SubNavItem href="/categoria/psicologia-estoica" label="Psicología estoica" />
+            <SubNavItem href="/categoria/general" label="General" />
+          </div>
+        </div>
+
+        <div className="pt-4 space-y-1 border-t border-gray-600/50">
+          <CartNavItem href="/tienda" icon={ShoppingBag} label="Tienda" />
+          {user ? (
+            <>
+              <NavItem href="/dashboard" icon={Settings} label="Dashboard" />
+              <NavItem href="/mi-cuenta" icon={User} label="Mi cuenta" />
+              <button
+                onClick={logout}
+                className="flex items-center gap-3 px-3 py-3 text-white hover:bg-white/10 rounded-lg transition-all duration-200 group w-full"
+              >
+                <LogOut className="h-5 w-5 text-gray-300 group-hover:text-[#D4AF37] transition-colors" />
+                <span className="font-medium group-hover:text-[#D4AF37] transition-colors">Cerrar sesión</span>
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => setIsAuthModalOpen(true)}
+              className="flex items-center gap-3 px-3 py-3 text-white hover:bg-white/10 rounded-lg transition-all duration-200 group w-full"
+            >
+              <LogIn className="h-5 w-5 text-gray-300 group-hover:text-[#D4AF37] transition-colors" />
+              <span className="font-medium group-hover:text-[#D4AF37] transition-colors">Iniciar sesión</span>
+            </button>
+          )}
+        </div>
+      </nav>
+
+      {/* Footer */}
+      <div className="p-6 border-t border-gray-600/50">
+        <div className="text-center">
+          <p className="text-gray-300 text-xs mb-3">
+            Blog de referencia en estoicismo
+          </p>
+          <div className="flex justify-center space-x-4">
+            <Link href="#" className="text-gray-400 hover:text-white transition-colors" aria-label="Twitter">
+              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
+              </svg>
+            </Link>
+            <Link href="#" className="text-gray-400 hover:text-white transition-colors" aria-label="X (Twitter)">
+              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z"/>
+              </svg>
+            </Link>
+            <Link href="#" className="text-gray-400 hover:text-white transition-colors" aria-label="Pinterest">
+              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.174-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.1.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.402.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.357-.629-2.751-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24.009 12.017 24c6.624 0 11.99-5.367 11.99-11.987C24.007 5.367 18.641.001 12.017.001z"/>
+              </svg>
+            </Link>
+          </div>
+        </div>
+      </div>
+      
+      {/* Modal de autenticación */}
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)} 
+      />
+    </div>
+  );
+}
+
+function NavItem({ href, icon: Icon, label }: { href: string; icon: React.ElementType; label: string }) {
+  return (
+    <Link
+      href={href}
+      className="flex items-center gap-3 px-3 py-3 text-white hover:bg-white/10 rounded-lg transition-all duration-200 group"
+    >
+      <Icon className="h-5 w-5 text-gray-300 group-hover:text-[#D4AF37] transition-colors" />
+      <span className="font-medium group-hover:text-[#D4AF37] transition-colors">{label}</span>
+    </Link>
+  );
+}
+
+function SubNavItem({ href, label }: { href: string; label: string }) {
+  return (
+    <Link
+      href={href}
+      className="block px-3 py-2 text-gray-300 hover:text-white hover:bg-white/5 rounded-md transition-all duration-200 text-sm"
+    >
+      {label}
+    </Link>
+  );
+}
+
+function CartNavItem({ href, icon: Icon, label }: { href: string; icon: React.ElementType; label: string }) {
+  const { state } = useCart();
+  
+  return (
+    <Link
+      href="/carrito"
+      className="flex items-center gap-3 px-3 py-3 text-white hover:bg-white/10 rounded-lg transition-all duration-200 group relative"
+    >
+      <Icon className="h-5 w-5 text-gray-300 group-hover:text-[#D4AF37] transition-colors" />
+      <span className="font-medium group-hover:text-[#D4AF37] transition-colors">{label}</span>
+      {state.itemCount > 0 && (
+        <span className="ml-auto bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+          {state.itemCount}
+        </span>
+      )}
+    </Link>
+  );
+}

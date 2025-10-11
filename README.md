@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# brian-blog
 
-## Getting Started
+Un blog personal sobre filosofía estoica, desarrollo personal y reflexiones sobre la vida.
 
-First, run the development server:
+## Descripción
+
+Este es mi blog personal donde comparto mis memorias de la vida y su eterno retorno, explorando temas relacionados con el estoicismo, la filosofía y el crecimiento personal.
+
+## Características
+
+- Blog personal
+- Categorías organizadas: citas estoicas, entrevistas, principios estoicos, psicología estoica
+- Dashboard para gestión de contenido
+- Diseño responsive y moderno
+- Sistema de comentarios
+- Tienda integrada
+
+## Tecnologías
+
+- Next.js 14
+- React
+- TypeScript
+- Tailwind CSS
+- Lucide React (iconos)
+
+## Instalación
+
+1. Instala las dependencias:
+
+```bash
+npm install
+```
+
+2. Ejecuta el servidor de desarrollo:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3. Abre [http://localhost:3000](http://localhost:3000) en tu navegador
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Estructura del Proyecto
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `/src/app` - Páginas y layouts de la aplicación
+- `/src/components` - Componentes reutilizables
+- `/src/lib` - Utilidades y configuraciones
+- `/public` - Archivos estáticos (imágenes, iconos)
 
-## Learn More
+## Contribuir
 
-To learn more about Next.js, take a look at the following resources:
+Este es un proyecto personal, pero si tienes sugerencias o encuentras algún error, no dudes en contactarme.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Licencia
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Todos los derechos reservados.
