@@ -128,16 +128,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Buscar o crear un usuario por defecto (temporal)
-    let author = await prisma.user.findFirst();
+    // Buscar un usuario existente
+    const author = await prisma.user.findFirst();
     if (!author) {
-      author = await prisma.user.create({
-        data: {
-          email: 'admin@blog.com',
-          name: 'Admin',
-          password: 'temp_password' // En producción, esto debería ser hasheado
-        }
-      });
+      return NextResponse.json(
+        { error: 'No hay usuarios registrados. Por favor, regístrate primero.' },
+        { status: 400 }
+      );
     }
 
     // Crear nuevo post en la base de datos

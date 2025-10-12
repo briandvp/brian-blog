@@ -1,82 +1,124 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, FileText, Eye, Edit, Trash2, Calendar, User } from "lucide-react";
+import { Plus, FileText, Eye, Edit, Trash2, Calendar, User, Loader2 } from "lucide-react";
 import { CreatePostModal } from "@/components/dashboard/create-post-modal";
 import { EditPostModal } from "@/components/dashboard/edit-post-modal";
 
-// Datos de ejemplo - en producción vendrían de una API
-const mockPosts = [
-  {
-    id: 1,
-    title: "La dicotomía de control en la vida moderna",
-    excerpt: "Una reflexión profunda sobre cómo aplicar los principios estoicos en nuestro día a día...",
-    category: "Principios estoicos",
-    status: "published",
-    author: "Brian",
-    createdAt: "2024-01-15",
-    updatedAt: "2024-01-15",
-    views: 1250,
-    comments: 23
-  },
-  {
-    id: 2,
-    title: "Entrevista con un filósofo estoico contemporáneo",
-    excerpt: "Conversación exclusiva sobre la relevancia del estoicismo en el siglo XXI...",
-    category: "Entrevistas",
-    status: "draft",
-    author: "Brian",
-    createdAt: "2024-01-10",
-    updatedAt: "2024-01-12",
-    views: 0,
-    comments: 0
-  },
-  {
-    id: 3,
-    title: "Citas estoicas para la resiliencia",
-    excerpt: "Una recopilación de las mejores citas de Marco Aurelio, Epicteto y Séneca...",
-    category: "Citas estoicas",
-    status: "published",
-    author: "Brian",
-    createdAt: "2024-01-08",
-    updatedAt: "2024-01-08",
-    views: 2100,
-    comments: 45
-  }
-];
+interface Post {
+  id: string;
+  title: string;
+  content: string;
+  excerpt: string;
+  category: string;
+  status: string;
+  views: number;
+  comments: number;
+  author: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
 
 export default function Dashboard() {
-  const [posts, setPosts] = useState(mockPosts);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingPost, setEditingPost] = useState<any>(null);
 
-  const handleCreatePost = (newPost: any) => {
-    const post = {
-      ...newPost,
-      id: Date.now(),
-      author: "Brian",
-      createdAt: new Date().toISOString().split('T')[0],
-      updatedAt: new Date().toISOString().split('T')[0],
-      views: 0,
-      comments: 0
+  // Cargar posts publicados desde la API
+  useEffect(() => {
+    const fetchPublishedPosts = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/posts?status=published');
+        if (response.ok) {
+          const data = await response.json();
+          setPosts(data.posts || []);
+        } else {
+          console.error('Error al cargar posts:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Error al cargar posts:', error);
+      } finally {
+        setLoading(false);
+      }
     };
-    setPosts([post, ...posts]);
-    setShowCreateModal(false);
+
+    fetchPublishedPosts();
+  }, []);
+
+  const handleCreatePost = async (newPost: any) => {
+    try {
+      const response = await fetch('/api/posts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ...newPost, status: 'published' }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setPosts([data.post, ...posts]);
+        setShowCreateModal(false);
+      } else {
+        console.error('Error al crear post:', response.statusText);
+        alert('Error al crear la publicación');
+      }
+    } catch (error) {
+      console.error('Error al crear post:', error);
+      alert('Error al crear la publicación');
+    }
   };
 
-  const handleEditPost = (updatedPost: any) => {
-    setPosts(posts.map(post => 
-      post.id === updatedPost.id 
-        ? { ...updatedPost, updatedAt: new Date().toISOString().split('T')[0] }
-        : post
-    ));
-    setEditingPost(null);
+  const handleEditPost = async (updatedPost: any) => {
+    try {
+      const response = await fetch(`/api/posts/${updatedPost.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedPost),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setPosts(posts.map(post => 
+          post.id === updatedPost.id ? data.post : post
+        ));
+        setEditingPost(null);
+      } else {
+        console.error('Error al actualizar post:', response.statusText);
+        alert('Error al actualizar la publicación');
+      }
+    } catch (error) {
+      console.error('Error al actualizar post:', error);
+      alert('Error al actualizar la publicación');
+    }
   };
 
-  const handleDeletePost = (postId: number) => {
+  const handleDeletePost = async (postId: string) => {
     if (confirm('¿Estás seguro de que quieres eliminar esta publicación?')) {
-      setPosts(posts.filter(post => post.id !== postId));
+      try {
+        const response = await fetch(`/api/posts/${postId}`, {
+          method: 'DELETE',
+        });
+
+        if (response.ok) {
+          setPosts(posts.filter(post => post.id !== postId));
+        } else {
+          console.error('Error al eliminar post:', response.statusText);
+          alert('Error al eliminar la publicación');
+        }
+      } catch (error) {
+        console.error('Error al eliminar post:', error);
+        alert('Error al eliminar la publicación');
+      }
     }
   };
 
@@ -121,12 +163,12 @@ export default function Dashboard() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center">
               <FileText className="h-8 w-8 text-blue-600" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total publicaciones</p>
+                <p className="text-sm font-medium text-gray-600">Publicaciones publicadas</p>
                 <p className="text-2xl font-bold text-gray-900">{posts.length}</p>
               </div>
             </div>
@@ -136,21 +178,9 @@ export default function Dashboard() {
             <div className="flex items-center">
               <Eye className="h-8 w-8 text-green-600" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Publicadas</p>
+                <p className="text-sm font-medium text-gray-600">Vistas totales</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {posts.filter(p => p.status === 'published').length}
-                </p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <Edit className="h-8 w-8 text-yellow-600" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Borradores</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {posts.filter(p => p.status === 'draft').length}
+                  {posts.reduce((sum, post) => sum + post.views, 0).toLocaleString()}
                 </p>
               </div>
             </div>
@@ -160,9 +190,9 @@ export default function Dashboard() {
             <div className="flex items-center">
               <Calendar className="h-8 w-8 text-purple-600" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Vistas totales</p>
+                <p className="text-sm font-medium text-gray-600">Comentarios totales</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {posts.reduce((sum, post) => sum + post.views, 0)}
+                  {posts.reduce((sum, post) => sum + post.comments, 0)}
                 </p>
               </div>
             </div>
@@ -172,35 +202,54 @@ export default function Dashboard() {
         {/* Posts Table */}
         <div className="bg-white rounded-lg shadow overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Publicaciones</h2>
+            <h2 className="text-lg font-semibold text-gray-900">Publicaciones publicadas</h2>
           </div>
           
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Título
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Categoría
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Estado
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Vistas
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Fecha
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Acciones
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {posts.map((post) => (
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="text-gray-400 mb-4">
+                <Loader2 className="h-12 w-12 mx-auto animate-spin" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                Cargando publicaciones...
+              </h3>
+            </div>
+          ) : posts.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-gray-400 mb-4">
+                <FileText className="h-12 w-12 mx-auto" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No hay publicaciones publicadas
+              </h3>
+              <p className="text-gray-600">
+                Crea tu primera publicación para comenzar
+              </p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Título
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Categoría
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Vistas
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Fecha
+                    </th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Acciones
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {posts.map((post) => (
                   <tr key={post.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4">
                       <div>
@@ -214,9 +263,6 @@ export default function Dashboard() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="text-sm text-gray-900">{post.category}</span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {getStatusBadge(post.status)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {post.views.toLocaleString()}
@@ -253,10 +299,11 @@ export default function Dashboard() {
                       </div>
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
         {/* Modals */}
