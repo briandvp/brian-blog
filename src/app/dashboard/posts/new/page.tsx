@@ -42,18 +42,36 @@ export default function NewPost() {
   const handleSave = async (status: string) => {
     setIsSaving(true);
     
-    // Simular guardado
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    const postData = {
+      ...post,
+      status
+    };
     
-    console.log("Guardando post:", { ...post, status });
+    console.log('Saving post with data:', postData);
     
-    // En una aplicación real, aquí se haría la llamada a la API
-    alert(`Post ${status === "draft" ? "guardado como borrador" : "publicado"} exitosamente`);
-    
-    setIsSaving(false);
-    
-    if (status === "published") {
-      router.push("/dashboard/posts");
+    try {
+      const response = await fetch('/api/posts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(postData),
+      });
+
+      const data = await response.json();
+      console.log('API response:', data);
+
+      if (response.ok) {
+        alert(`Post ${status === 'published' ? 'publicado' : 'guardado como borrador'} exitosamente!`);
+        router.push('/dashboard/posts');
+      } else {
+        alert(`Error: ${data.error}`);
+      }
+    } catch (error) {
+      console.error('Error saving post:', error);
+      alert('Error al guardar el post');
+    } finally {
+      setIsSaving(false);
     }
   };
 

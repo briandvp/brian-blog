@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Home, BookOpen, ShoppingBag, User, Settings, ShoppingCart, LogIn, LogOut } from "lucide-react";
+import { Menu, Home, BookOpen, ShoppingBag, User, Settings, ShoppingCart, LogIn, LogOut, Plus } from "lucide-react";
 import Image from "next/image";
 import { useCart } from "@/contexts/cart-context";
 import { useAuth } from "@/contexts/auth-context";
@@ -144,11 +144,18 @@ export function Navbar() {
 }
 
 function DesktopNav() {
+  const { user } = useAuth();
+  
   return (
     <>
       {/* Contenido Principal */}
       <NavLink href="/" label="Inicio" />
       <NavLink href="/blog" label="Blog" />
+      
+      {/* Enlace para crear posts (solo para usuarios autenticados) */}
+      {user && (
+        <NavLink href="/dashboard/posts/new" label="Nueva Publicación" />
+      )}
       
       {/* Servicios */}
       <NavLink href="/tienda" label="Tienda" />
@@ -193,6 +200,9 @@ function MobileSidebar() {
         <div className="space-y-1">
           <NavItem href="/" icon={Home} label="Inicio" />
           <NavItem href="/blog" icon={BookOpen} label="Blog" />
+          {user && (
+            <NavItem href="/dashboard/posts/new" icon={Plus} label="Nueva Publicación" />
+          )}
         </div>
 
         <div className="pt-4 space-y-1 border-t border-gray-600/50">
