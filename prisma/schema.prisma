@@ -26,7 +26,11 @@ model Post {
   id        String   @id @default(cuid())
   title     String
   content   String
+  excerpt   String?
+  category  String   @default("General")
   published Boolean  @default(false)
+  views     Int      @default(0)
+  comments  Int      @default(0)
   authorId  String
   author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())

@@ -1,77 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-// import { prisma } from '@/lib/prisma';
-
-// Simulamos una base de datos en memoria para los posts (temporal)
-let posts = [
-  {
-    id: "1",
-    title: "La dicotomía de control en la vida moderna",
-    content: "Una reflexión profunda sobre cómo aplicar los principios estoicos en nuestro día a día. La dicotomía de control es uno de los conceptos fundamentales del estoicismo que nos enseña a distinguir entre lo que está bajo nuestro control y lo que no.",
-    excerpt: "Una reflexión profunda sobre cómo aplicar los principios estoicos en nuestro día a día...",
-    category: "Principios estoicos",
-    status: "published",
-    views: 1250,
-    comments: 23,
-    author: {
-      id: "1",
-      name: "Brian",
-      email: "brian@example.com"
-    },
-    createdAt: "2024-01-15T10:00:00Z",
-    updatedAt: "2024-01-15T10:00:00Z"
-  },
-  {
-    id: "2",
-    title: "Entrevista con un filósofo estoico contemporáneo",
-    content: "Conversación exclusiva sobre la relevancia del estoicismo en el siglo XXI. Exploramos cómo los principios antiguos pueden aplicarse a los desafíos modernos.",
-    excerpt: "Conversación exclusiva sobre la relevancia del estoicismo en el siglo XXI...",
-    category: "Entrevistas",
-    status: "published",
-    views: 890,
-    comments: 15,
-    author: {
-      id: "1",
-      name: "Brian",
-      email: "brian@example.com"
-    },
-    createdAt: "2024-01-10T14:30:00Z",
-    updatedAt: "2024-01-10T14:30:00Z"
-  },
-  {
-    id: "3",
-    title: "Citas estoicas para la resiliencia",
-    content: "Una recopilación de las mejores citas de Marco Aurelio, Epicteto y Séneca que nos ayudan a desarrollar la resiliencia mental y emocional.",
-    excerpt: "Una recopilación de las mejores citas de Marco Aurelio, Epicteto y Séneca...",
-    category: "Citas estoicas",
-    status: "published",
-    views: 2100,
-    comments: 45,
-    author: {
-      id: "1",
-      name: "Brian",
-      email: "brian@example.com"
-    },
-    createdAt: "2024-01-08T09:15:00Z",
-    updatedAt: "2024-01-08T09:15:00Z"
-  },
-  {
-    id: "4",
-    title: "La psicología del estoicismo aplicada",
-    content: "Cómo los principios estoicos pueden mejorar nuestra salud mental y bienestar psicológico en el mundo moderno.",
-    excerpt: "Cómo los principios estoicos pueden mejorar nuestra salud mental...",
-    category: "Psicología estoica",
-    status: "published",
-    views: 1800,
-    comments: 32,
-    author: {
-      id: "1",
-      name: "Brian",
-      email: "brian@example.com"
-    },
-    createdAt: "2024-01-05T16:45:00Z",
-    updatedAt: "2024-01-05T16:45:00Z"
-  }
-];
+import { prisma } from '@/lib/prisma';
 
 // GET /api/posts - Obtener todos los posts
 export async function GET(request: NextRequest) {
@@ -84,49 +12,94 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '10');
 
     console.log('Fetching posts with params:', { status, category, search, page, limit });
-    console.log('Total posts available:', posts.length);
 
-    // Filtrar posts por estado
-    let filteredPosts = posts;
-    if (status && status !== 'all') {
-      filteredPosts = posts.filter(post => post.status === status);
+    // Construir filtros para Prisma
+    const where: any = {};
+    
+    if (status === 'published') {
+      where.published = true;
+    } else if (status === 'draft') {
+      where.published = false;
     }
 
-    // Filtrar por categoría
     if (category && category !== 'all') {
-      filteredPosts = filteredPosts.filter(post => post.category === category);
+      where.category = category;
     }
 
-    // Filtrar por búsqueda
     if (search) {
-      filteredPosts = filteredPosts.filter(post => 
-        post.title.toLowerCase().includes(search.toLowerCase()) ||
-        post.excerpt.toLowerCase().includes(search.toLowerCase()) ||
-        post.content.toLowerCase().includes(search.toLowerCase())
-      );
+      where.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
+        { excerpt: { contains: search, mode: 'insensitive' } },
+        { content: { contains: search, mode: 'insensitive' } }
+      ];
     }
 
-    // Paginación
+    // Obtener posts con paginación
     const skip = (page - 1) * limit;
-    const paginatedPosts = filteredPosts.slice(skip, skip + limit);
+    
+    const [posts, totalCount] = await Promise.all([
+      prisma.post.findMany({
+        where,
+        include: {
+          author: {
+            select: {
+              id: true,
+              name: true,
+              email: true
+            }
+          }
+        },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit
+      }),
+      prisma.post.count({ where })
+    ]);
+
+    // Transformar datos para mantener compatibilidad con el frontend
+    const transformedPosts = posts.map(post => ({
+      id: post.id,
+      title: post.title,
+      content: post.content,
+      excerpt: post.excerpt || post.content.substring(0, 150) + '...',
+      category: post.category,
+      status: post.published ? 'published' : 'draft',
+      views: post.views,
+      comments: post.comments,
+      author: {
+        id: post.author.id,
+        name: post.author.name || 'Autor',
+        email: post.author.email
+      },
+      createdAt: post.createdAt.toISOString(),
+      updatedAt: post.updatedAt.toISOString()
+    }));
 
     // Calcular estadísticas
+    const [publishedCount, draftCount, totalViews] = await Promise.all([
+      prisma.post.count({ where: { published: true } }),
+      prisma.post.count({ where: { published: false } }),
+      prisma.post.aggregate({
+        _sum: { views: true }
+      })
+    ]);
+
     const stats = {
-      total: filteredPosts.length,
-      published: posts.filter(post => post.status === 'published').length,
-      drafts: posts.filter(post => post.status === 'draft').length,
-      totalViews: posts.reduce((sum, post) => sum + post.views, 0)
+      total: totalCount,
+      published: publishedCount,
+      drafts: draftCount,
+      totalViews: totalViews._sum.views || 0
     };
 
-    console.log('Posts fetched:', paginatedPosts.length);
+    console.log('Posts fetched:', transformedPosts.length);
 
     return NextResponse.json({
-      posts: paginatedPosts,
+      posts: transformedPosts,
       pagination: {
         page,
         limit,
-        total: filteredPosts.length,
-        pages: Math.ceil(filteredPosts.length / limit)
+        total: totalCount,
+        pages: Math.ceil(totalCount / limit)
       },
       stats
     });
@@ -155,34 +128,63 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Crear nuevo post
-    const newPost = {
-      id: (posts.length + 1).toString(),
-      title,
-      content,
-      excerpt: excerpt || content.substring(0, 150) + '...',
-      category: category || 'General',
-      status,
-      views: 0,
-      comments: 0,
-      author: {
-        id: "1",
-        name: "Brian",
-        email: "brian@example.com"
+    // Buscar o crear un usuario por defecto (temporal)
+    let author = await prisma.user.findFirst();
+    if (!author) {
+      author = await prisma.user.create({
+        data: {
+          email: 'admin@blog.com',
+          name: 'Admin',
+          password: 'temp_password' // En producción, esto debería ser hasheado
+        }
+      });
+    }
+
+    // Crear nuevo post en la base de datos
+    const newPost = await prisma.post.create({
+      data: {
+        title,
+        content,
+        excerpt: excerpt || content.substring(0, 150) + '...',
+        category: category || 'General',
+        published: status === 'published',
+        authorId: author.id
       },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            email: true
+          }
+        }
+      }
+    });
+
+    // Transformar para mantener compatibilidad con el frontend
+    const transformedPost = {
+      id: newPost.id,
+      title: newPost.title,
+      content: newPost.content,
+      excerpt: newPost.excerpt || newPost.content.substring(0, 150) + '...',
+      category: newPost.category,
+      status: newPost.published ? 'published' : 'draft',
+      views: newPost.views,
+      comments: newPost.comments,
+      author: {
+        id: newPost.author.id,
+        name: newPost.author.name || 'Autor',
+        email: newPost.author.email
+      },
+      createdAt: newPost.createdAt.toISOString(),
+      updatedAt: newPost.updatedAt.toISOString()
     };
 
-    // Agregar el post al array
-    posts.unshift(newPost); // Agregar al inicio para que aparezca primero
-
-    console.log('Post created successfully:', newPost);
-    console.log('Total posts now:', posts.length);
+    console.log('Post created successfully:', transformedPost);
 
     return NextResponse.json({
       message: 'Post creado exitosamente',
-      post: newPost
+      post: transformedPost
     }, { status: 201 });
 
   } catch (error) {
