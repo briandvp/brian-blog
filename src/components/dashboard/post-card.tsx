@@ -5,18 +5,22 @@ import { Eye, Edit, Trash2, Calendar, User, MessageCircle } from "lucide-react";
 
 interface PostCardProps {
   post: {
-    id: number;
+    id: string;
     title: string;
     excerpt: string;
     category: string;
     status: string;
-    author: string;
+    author: {
+      id: string;
+      name: string;
+      email: string;
+    };
     createdAt: string;
     views: number;
     comments: number;
   };
   onEdit: (post: any) => void;
-  onDelete: (id: number) => void;
+  onDelete: (id: string) => void;
 }
 
 export function PostCard({ post, onEdit, onDelete }: PostCardProps) {
@@ -62,7 +66,7 @@ export function PostCard({ post, onEdit, onDelete }: PostCardProps) {
         <div className="flex items-center text-sm text-gray-500 mb-4 space-x-4">
           <div className="flex items-center">
             <User className="h-4 w-4 mr-1" />
-            {post.author}
+            {post.author.name}
           </div>
           <div className="flex items-center">
             <Calendar className="h-4 w-4 mr-1" />
@@ -90,7 +94,7 @@ export function PostCard({ post, onEdit, onDelete }: PostCardProps) {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => window.open(`/post/${post.id}`, '_blank')}
+            onClick={() => window.open(`/blog/${post.id}`, '_blank')}
             className="text-blue-600 hover:text-blue-900"
           >
             <Eye className="h-4 w-4 mr-2" />

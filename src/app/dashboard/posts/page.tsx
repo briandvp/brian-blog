@@ -1,98 +1,128 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, Filter, Grid, List } from "lucide-react";
+import { Plus, Search, Filter, Grid, List, Loader2 } from "lucide-react";
 import { CreatePostModal } from "@/components/dashboard/create-post-modal";
 import { EditPostModal } from "@/components/dashboard/edit-post-modal";
 import { PostCard } from "@/components/dashboard/post-card";
 
-// Datos de ejemplo - en producción vendrían de una API
-const mockPosts = [
-  {
-    id: 1,
-    title: "La dicotomía de control en la vida moderna",
-    excerpt: "Una reflexión profunda sobre cómo aplicar los principios estoicos en nuestro día a día...",
-    category: "Principios estoicos",
-    status: "published",
-    author: "Brian",
-    createdAt: "2024-01-15",
-    updatedAt: "2024-01-15",
-    views: 1250,
-    comments: 23
-  },
-  {
-    id: 2,
-    title: "Entrevista con un filósofo estoico contemporáneo",
-    excerpt: "Conversación exclusiva sobre la relevancia del estoicismo en el siglo XXI...",
-    category: "Entrevistas",
-    status: "draft",
-    author: "Brian",
-    createdAt: "2024-01-10",
-    updatedAt: "2024-01-12",
-    views: 0,
-    comments: 0
-  },
-  {
-    id: 3,
-    title: "Citas estoicas para la resiliencia",
-    excerpt: "Una recopilación de las mejores citas de Marco Aurelio, Epicteto y Séneca...",
-    category: "Citas estoicas",
-    status: "published",
-    author: "Brian",
-    createdAt: "2024-01-08",
-    updatedAt: "2024-01-08",
-    views: 2100,
-    comments: 45
-  },
-  {
-    id: 4,
-    title: "La psicología del estoicismo aplicada",
-    excerpt: "Cómo los principios estoicos pueden mejorar nuestra salud mental...",
-    category: "Psicología estoica",
-    status: "published",
-    author: "Brian",
-    createdAt: "2024-01-05",
-    updatedAt: "2024-01-05",
-    views: 1800,
-    comments: 32
-  }
-];
+interface Post {
+  id: string;
+  title: string;
+  content: string;
+  excerpt: string;
+  category: string;
+  status: string;
+  views: number;
+  comments: number;
+  author: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
 
 export default function PostsPage() {
-  const [posts, setPosts] = useState(mockPosts);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editingPost, setEditingPost] = useState(null);
+  const [editingPost, setEditingPost] = useState<Post | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  const handleCreatePost = (newPost: any) => {
-    const post = {
-      ...newPost,
-      id: Date.now(),
-      author: "Brian",
-      createdAt: new Date().toISOString().split('T')[0],
-      updatedAt: new Date().toISOString().split('T')[0],
-      views: 0,
-      comments: 0
+  // Cargar posts desde la API
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/posts');
+        if (response.ok) {
+          const data = await response.json();
+          setPosts(data.posts || []);
+        } else {
+          console.error('Error al cargar posts:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Error al cargar posts:', error);
+      } finally {
+        setLoading(false);
+      }
     };
-    setPosts([post, ...posts]);
-    setShowCreateModal(false);
+
+    fetchPosts();
+  }, []);
+
+  const handleCreatePost = async (newPost: any) => {
+    try {
+      const response = await fetch('/api/posts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newPost),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setPosts([data.post, ...posts]);
+        setShowCreateModal(false);
+      } else {
+        console.error('Error al crear post:', response.statusText);
+        alert('Error al crear la publicación');
+      }
+    } catch (error) {
+      console.error('Error al crear post:', error);
+      alert('Error al crear la publicación');
+    }
   };
 
-  const handleEditPost = (updatedPost: any) => {
-    setPosts(posts.map(post => 
-      post.id === updatedPost.id 
-        ? { ...updatedPost, updatedAt: new Date().toISOString().split('T')[0] }
-        : post
-    ));
-    setEditingPost(null);
+  const handleEditPost = async (updatedPost: any) => {
+    try {
+      const response = await fetch(`/api/posts/${updatedPost.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedPost),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setPosts(posts.map(post => 
+          post.id === updatedPost.id ? data.post : post
+        ));
+        setEditingPost(null);
+      } else {
+        console.error('Error al actualizar post:', response.statusText);
+        alert('Error al actualizar la publicación');
+      }
+    } catch (error) {
+      console.error('Error al actualizar post:', error);
+      alert('Error al actualizar la publicación');
+    }
   };
 
-  const handleDeletePost = (postId: number) => {
+  const handleDeletePost = async (postId: string) => {
     if (confirm('¿Estás seguro de que quieres eliminar esta publicación?')) {
-      setPosts(posts.filter(post => post.id !== postId));
+      try {
+        const response = await fetch(`/api/posts/${postId}`, {
+          method: 'DELETE',
+        });
+
+        if (response.ok) {
+          setPosts(posts.filter(post => post.id !== postId));
+        } else {
+          console.error('Error al eliminar post:', response.statusText);
+          alert('Error al eliminar la publicación');
+        }
+      } catch (error) {
+        console.error('Error al eliminar post:', error);
+        alert('Error al eliminar la publicación');
+      }
     }
   };
 
@@ -179,7 +209,16 @@ export default function PostsPage() {
         </div>
 
         {/* Posts Grid/List */}
-        {filteredPosts.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="text-gray-400 mb-4">
+              <Loader2 className="h-12 w-12 mx-auto animate-spin" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              Cargando publicaciones...
+            </h3>
+          </div>
+        ) : filteredPosts.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-gray-400 mb-4">
               <Search className="h-12 w-12 mx-auto" />
