@@ -3,6 +3,14 @@
 import { useState } from 'react'
 import { useAuth } from '@/contexts/auth-context'
 import { Button } from '@/components/ui/button'
+import { 
+  User, 
+  Mail, 
+  Lock, 
+  Eye, 
+  EyeOff, 
+  LogIn
+} from 'lucide-react'
 
 interface LoginFormProps {
   onSuccess?: () => void
@@ -14,6 +22,7 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   
   const { login } = useAuth()
 
@@ -35,40 +44,72 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
 
   return (
     <div className="w-full max-w-md mx-auto">
-      <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg px-8 pt-6 pb-8 mb-4">
-        <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-white mb-6">
-          Iniciar Sesión
-        </h2>
+      <div className="bg-white shadow-lg rounded-lg px-8 pt-6 pb-8 mb-4">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="mx-auto w-16 h-16 bg-[#42403e] rounded-full flex items-center justify-center mb-4">
+            <User className="h-8 w-8 text-white" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900">
+            Iniciar Sesión
+          </h2>
+          <p className="text-gray-600 mt-2">
+            Accede a tu cuenta para continuar
+          </p>
+        </div>
         
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Email
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              Correo electrónico
             </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-              placeholder="tu@email.com"
-            />
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-[#D4AF37] focus:border-[#D4AF37] outline-none"
+                placeholder="tu@email.com"
+              />
+            </div>
           </div>
           
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
               Contraseña
             </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-              placeholder="••••••••"
-            />
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md focus:ring-[#D4AF37] focus:border-[#D4AF37] outline-none"
+                placeholder="••••••••"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <label className="flex items-center">
+              <input type="checkbox" className="h-4 w-4 text-[#D4AF37] focus:ring-[#D4AF37] border-gray-300 rounded" />
+              <span className="ml-2 text-sm text-gray-600">Recordarme</span>
+            </label>
+            <a href="#" className="text-sm text-[#D4AF37] hover:underline">
+              ¿Olvidaste tu contraseña?
+            </a>
           </div>
           
           {error && (
@@ -80,19 +121,20 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
           <Button
             type="submit"
             disabled={loading}
-            className="w-full"
+            className="w-full bg-[#42403e] hover:bg-[#36312f] text-white"
           >
+            <LogIn className="h-4 w-4 mr-2" />
             {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
           </Button>
         </form>
         
         {onSwitchToRegister && (
-          <div className="text-center mt-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+          <div className="text-center mt-6">
+            <p className="text-sm text-gray-600">
               ¿No tienes cuenta?{' '}
               <button
                 onClick={onSwitchToRegister}
-                className="text-blue-600 hover:text-blue-500 font-medium"
+                className="text-[#D4AF37] hover:underline font-medium"
               >
                 Regístrate aquí
               </button>

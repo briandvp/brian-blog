@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { useRouter } from 'next/navigation'
 
 interface User {
   id: string
@@ -21,6 +22,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const router = useRouter()
 
   useEffect(() => {
     // Verificar si hay un usuario guardado en localStorage
@@ -46,6 +48,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (response.ok) {
         setUser(data.user)
         localStorage.setItem('user', JSON.stringify(data.user))
+        // Redirigir a la página de inicio después del login exitoso
+        router.push('/')
         return { success: true }
       } else {
         return { success: false, error: data.error }
@@ -70,6 +74,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (response.ok) {
         setUser(data.user)
         localStorage.setItem('user', JSON.stringify(data.user))
+        // Redirigir a la página de inicio después del registro exitoso
+        router.push('/')
         return { success: true }
       } else {
         return { success: false, error: data.error }
@@ -82,6 +88,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     setUser(null)
     localStorage.removeItem('user')
+    // Redirigir a la página de login después del logout
+    router.push('/')
   }
 
   return (

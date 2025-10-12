@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { ChevronDown, Menu, Home, BookOpen, Users, GraduationCap, ShoppingBag, User, Settings, ShoppingCart, LogIn, LogOut } from "lucide-react";
+import { Menu, Home, BookOpen, ShoppingBag, User, Settings, ShoppingCart, LogIn, LogOut } from "lucide-react";
 import Image from "next/image";
 import { useCart } from "@/contexts/cart-context";
 import { useAuth } from "@/contexts/auth-context";
@@ -29,7 +29,7 @@ export function Navbar() {
           <div className="flex items-center">
             <Link href="/" className="flex group" aria-label="Ir al inicio">
               <Image
-                src="/logo-blog.svg"
+                src="/uroboro.png"
                 alt="brian-blog"
                 width={160}
                 height={45}
@@ -148,64 +148,10 @@ function DesktopNav() {
     <>
       {/* Contenido Principal */}
       <NavLink href="/" label="Inicio" />
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button 
-            variant="ghost" 
-            className="text-white hover:text-[#D4AF37] hover:bg-white/5 transition-all duration-300 font-medium flex items-center gap-1 px-2 py-1 text-sm relative group"
-            aria-label="Abrir menú del blog"
-          >
-            BLOG
-            <ChevronDown className="h-3 w-3 transition-transform group-data-[state=open]:rotate-180" />
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#D4AF37] transition-all duration-300 group-hover:w-full"></span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent 
-          align="end" 
-          className="w-56 bg-[#42403e] text-white border-gray-600 shadow-xl"
-          aria-label="Categorías del blog"
-        >
-          <DropdownMenuItem className="hover:bg-white/10 cursor-pointer focus:bg-white/10 transition-colors">
-            <Link href="/categoria/citas-estoicas" className="w-full flex items-center gap-2">
-              <BookOpen className="h-4 w-4" />
-              Citas estoicas
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem className="hover:bg-white/10 cursor-pointer focus:bg-white/10 transition-colors">
-            <Link href="/categoria/entrevistas" className="w-full flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Entrevistas
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem className="hover:bg-white/10 cursor-pointer focus:bg-white/10 transition-colors">
-            <Link href="/categoria/principios-estoicos" className="w-full flex items-center gap-2">
-              <GraduationCap className="h-4 w-4" />
-              Principios estoicos
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem className="hover:bg-white/10 cursor-pointer focus:bg-white/10 transition-colors">
-            <Link href="/categoria/psicologia-estoica" className="w-full flex items-center gap-2">
-              <BookOpen className="h-4 w-4" />
-              Psicología estoica
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem className="hover:bg-white/10 cursor-pointer focus:bg-white/10 transition-colors">
-            <Link href="/categoria/general" className="w-full flex items-center gap-2">
-              <BookOpen className="h-4 w-4" />
-              General
-            </Link>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-      <NavLink href="/que-es-el-estoicismo" label="¿Qué es el estoicismo?" />
-      <NavLink href="/comunidad-estoica" label="Comunidad" />
+      <NavLink href="/blog" label="Blog" />
       
       {/* Servicios */}
       <NavLink href="/tienda" label="Tienda" />
-      
-      {/* Usuario */}
-      <NavLink href="/dashboard" label="Dashboard" />
-      <NavLink href="/mi-cuenta" label="Mi cuenta" />
     </>
   );
 }
@@ -246,39 +192,19 @@ function MobileSidebar() {
       <nav className="flex-1 py-6 px-4 space-y-2 overflow-y-auto" aria-label="Navegación móvil">
         <div className="space-y-1">
           <NavItem href="/" icon={Home} label="Inicio" />
-          <NavItem href="/que-es-el-estoicismo" icon={BookOpen} label="¿Qué es el estoicismo?" />
-          <NavItem href="/comunidad-estoica" icon={Users} label="Comunidad" />
-        </div>
-
-        {/* Blog Section */}
-        <div className="pt-4">
-          <div className="flex items-center gap-2 px-3 py-2 text-[#D4AF37] font-semibold text-sm border-b border-gray-600/50 mb-3">
-            <BookOpen className="h-4 w-4" />
-            BLOG
-          </div>
-          <div className="pl-4 space-y-1">
-            <SubNavItem href="/categoria/citas-estoicas" label="Citas estoicas" />
-            <SubNavItem href="/categoria/entrevistas" label="Entrevistas" />
-            <SubNavItem href="/categoria/principios-estoicos" label="Principios estoicos" />
-            <SubNavItem href="/categoria/psicologia-estoica" label="Psicología estoica" />
-            <SubNavItem href="/categoria/general" label="General" />
-          </div>
+          <NavItem href="/blog" icon={BookOpen} label="Blog" />
         </div>
 
         <div className="pt-4 space-y-1 border-t border-gray-600/50">
           <CartNavItem href="/tienda" icon={ShoppingBag} label="Tienda" />
           {user ? (
-            <>
-              <NavItem href="/dashboard" icon={Settings} label="Dashboard" />
-              <NavItem href="/mi-cuenta" icon={User} label="Mi cuenta" />
-              <button
-                onClick={logout}
-                className="flex items-center gap-3 px-3 py-3 text-white hover:bg-white/10 rounded-lg transition-all duration-200 group w-full"
-              >
-                <LogOut className="h-5 w-5 text-gray-300 group-hover:text-[#D4AF37] transition-colors" />
-                <span className="font-medium group-hover:text-[#D4AF37] transition-colors">Cerrar sesión</span>
-              </button>
-            </>
+            <button
+              onClick={logout}
+              className="flex items-center gap-3 px-3 py-3 text-white hover:bg-white/10 rounded-lg transition-all duration-200 group w-full"
+            >
+              <LogOut className="h-5 w-5 text-gray-300 group-hover:text-[#D4AF37] transition-colors" />
+              <span className="font-medium group-hover:text-[#D4AF37] transition-colors">Cerrar sesión</span>
+            </button>
           ) : (
             <button
               onClick={() => setIsAuthModalOpen(true)}
