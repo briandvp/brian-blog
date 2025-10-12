@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+// import { prisma } from '@/lib/prisma';
 
-// Simulamos una base de datos en memoria para los posts
+// Simulamos una base de datos en memoria para los posts (temporal)
 let posts = [
   {
     id: "1",
@@ -85,7 +86,6 @@ export async function GET(request: NextRequest) {
     console.log('Fetching posts with params:', { status, category, search, page, limit });
     console.log('Total posts available:', posts.length);
 
-
     // Filtrar posts por estado
     let filteredPosts = posts;
     if (status && status !== 'all') {
@@ -117,6 +117,8 @@ export async function GET(request: NextRequest) {
       drafts: posts.filter(post => post.status === 'draft').length,
       totalViews: posts.reduce((sum, post) => sum + post.views, 0)
     };
+
+    console.log('Posts fetched:', paginatedPosts.length);
 
     return NextResponse.json({
       posts: paginatedPosts,

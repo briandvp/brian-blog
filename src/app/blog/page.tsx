@@ -45,15 +45,22 @@ export default function BlogPage() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
+        console.log('Fetching posts from API...');
         const response = await fetch('/api/posts?status=published');
+        console.log('Response status:', response.status);
+        
         if (response.ok) {
           const data = await response.json();
+          console.log('Posts data received:', data);
           setPosts(data.posts || []);
         } else {
-          console.error('Error al cargar posts');
+          const errorData = await response.json();
+          console.error('Error al cargar posts:', errorData);
+          setPosts([]); // Establecer array vacío en caso de error
         }
       } catch (error) {
         console.error('Error al cargar posts:', error);
+        setPosts([]); // Establecer array vacío en caso de error
       } finally {
         setLoading(false);
       }
