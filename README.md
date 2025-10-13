@@ -17,10 +17,12 @@ Este es mi blog personal donde comparto mis memorias de la vida y su eterno reto
 
 ## Tecnologías
 
-- Next.js 14
-- React
+- Next.js 15
+- React 19
 - TypeScript
 - Tailwind CSS
+- Prisma (ORM)
+- PostgreSQL (producción) / SQLite (desarrollo)
 - Lucide React (iconos)
 
 ## Instalación
@@ -31,13 +33,47 @@ Este es mi blog personal donde comparto mis memorias de la vida y su eterno reto
 npm install
 ```
 
-2. Ejecuta el servidor de desarrollo:
+2. Configura las variables de entorno:
+
+```bash
+cp .env.example .env
+```
+
+Edita `.env` con tus credenciales de base de datos.
+
+3. Ejecuta las migraciones de Prisma:
+
+```bash
+npm run db:push
+```
+
+4. Ejecuta el servidor de desarrollo:
 
 ```bash
 npm run dev
 ```
 
-3. Abre [http://localhost:3000](http://localhost:3000) en tu navegador
+5. Abre [http://localhost:3000](http://localhost:3000) en tu navegador
+
+## Deploy en Vercel
+
+### Configuración de Base de Datos
+
+Este proyecto requiere PostgreSQL en producción. Opciones recomendadas:
+
+1. **Vercel Postgres** (integración nativa)
+2. **Neon** (https://neon.tech) - Gratis tier generoso
+3. **Supabase** (https://supabase.com) - Incluye auth y storage
+4. **Railway** (https://railway.app) - PostgreSQL managed
+
+### Pasos para Deploy
+
+1. Crea una base de datos PostgreSQL en el proveedor de tu elección
+2. En Vercel, agrega la variable de entorno:
+   - `DATABASE_URL`: Tu connection string de PostgreSQL
+3. Haz push a tu repositorio de Git
+4. Conecta el repo en Vercel
+5. Vercel ejecutará automáticamente las migraciones durante el build
 
 ## Estructura del Proyecto
 
