@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Calendar, User, Eye, MessageCircle, Clock } from 'lucide-react';
+import { ArticleComments } from '@/components/article-comments';
 
 interface Post {
   id: string;
@@ -216,6 +217,9 @@ export default function PostPage() {
               </div>
             </div>
           </article>
+
+          {/* Sección de comentarios */}
+          {postId && <ArticleComments postId={postId} />}
         </div>
       </div>
     </div>
