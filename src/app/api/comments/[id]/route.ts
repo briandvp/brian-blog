@@ -4,11 +4,12 @@ import { prisma } from '@/lib/prisma';
 // GET /api/comments/[id] - Obtener un comentario específico
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const comment = await prisma.comment.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         post: {
           select: {
@@ -46,9 +47,10 @@ export async function GET(
 // PUT /api/comments/[id] - Actualizar un comentario (cambiar estado, etc.)
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     let body;
     try {
       body = await request.json();
@@ -63,7 +65,7 @@ export async function PUT(
     const { status, content } = body;
 
     const comment = await prisma.comment.findUnique({
-      where: { id: params.id }
+      where: { id }
     });
 
     if (!comment) {
@@ -74,7 +76,7 @@ export async function PUT(
     }
 
     const updatedComment = await prisma.comment.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(status && { status: status.toUpperCase() }),
         ...(content && { content })
@@ -101,11 +103,12 @@ export async function PUT(
 // DELETE /api/comments/[id] - Eliminar un comentario
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const comment = await prisma.comment.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         replies: true
       }
@@ -120,7 +123,7 @@ export async function DELETE(
 
     // Eliminar el comentario y todas sus respuestas
     await prisma.comment.delete({
-      where: { id: params.id }
+      where: { id }
     });
 
     // Actualizar contador de comentarios del post
