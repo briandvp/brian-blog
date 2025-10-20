@@ -28,14 +28,22 @@ export function Navbar() {
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex group" aria-label="Ir al inicio">
-              <Image
-                src="/uroboro.png"
-                alt="brian-blog"
-                width={160}
-                height={45}
-                className="h-10 w-auto transition-transform duration-300 group-hover:scale-105"
-                priority
-              />
+              <div className="relative w-40 h-10 flex items-center justify-start">
+                <Image
+                  src="/uroboro.png"
+                  alt="brian-blog"
+                  width={160}
+                  height={45}
+                  className="h-10 w-auto transition-transform duration-300 group-hover:scale-105"
+                  priority
+                  sizes="160px"
+                  style={{
+                    width: 'auto',
+                    height: '2.5rem',
+                    maxWidth: '160px'
+                  }}
+                />
+              </div>
             </Link>
           </div>
 
