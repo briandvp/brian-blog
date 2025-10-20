@@ -1,12 +1,11 @@
 import { ArticleHeader } from "@/components/article-header";
 import { ArticleContent } from "@/components/article-content";
 import { ArticleComments } from "@/components/article-comments";
-import { Footer } from "@/components/footer";
 import { ContentSidebar } from "@/components/content-sidebar";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-gray-50">
       <div className="max-w-5xl xl:max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-8 py-10 relative">
         {/* Layout para pantallas medianas y grandes (lg-xl) */}
         <div className="lg:grid lg:grid-cols-4 lg:gap-8 2xl:hidden">
@@ -37,7 +36,6 @@ export default function Home() {
           <ContentSidebar />
         </div>
       </div>
-      <Footer />
     </div>
   );
 }

@@ -78,7 +78,7 @@ export default function PostPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      <div className="bg-gradient-to-br from-slate-50 to-slate-100">
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto">
             <div className="animate-pulse">
@@ -99,7 +99,7 @@ export default function PostPage() {
 
   if (error || !post) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      <div className="bg-gradient-to-br from-slate-50 to-slate-100">
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto text-center">
             <div className="bg-white rounded-lg shadow-lg p-8">
@@ -124,7 +124,7 @@ export default function PostPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="bg-gradient-to-br from-slate-50 to-slate-100">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Botón de regreso */}
