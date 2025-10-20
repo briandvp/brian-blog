@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { Navbar } from "@/components/navbar"
+import { Footer } from "@/components/footer"
 import { ThemeProvider } from "@/components/theme-provider"
 import { CartProvider } from "@/contexts/cart-context"
 import { AuthProvider } from "@/contexts/auth-context"
@@ -36,8 +37,13 @@ export default function RootLayout({
         <ThemeProvider>
           <AuthProvider>
             <CartProvider>
-              <Navbar />
-              {children}
+              <div className="min-h-screen flex flex-col">
+                <Navbar />
+                <main className="flex-1">
+                  {children}
+                </main>
+                <Footer />
+              </div>
             </CartProvider>
           </AuthProvider>
         </ThemeProvider>

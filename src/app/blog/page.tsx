@@ -14,7 +14,6 @@ import {
   Clock,
   BookOpen
 } from "lucide-react";
-import { Footer } from "@/components/footer";
 
 interface Post {
   id: string;
@@ -116,7 +115,7 @@ export default function BlogPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="text-center mb-12">
@@ -296,7 +295,6 @@ export default function BlogPage() {
           </div>
         )}
       </div>
-      <Footer />
     </div>
   );
 }
