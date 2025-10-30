@@ -54,8 +54,8 @@ export function Navbar() {
 
           {/* Carrito y acciones */}
           <div className="flex items-center space-x-4">
-            {/* Carrito con indicador - solo para usuarios logueados */}
-            {user && (
+            {/* Carrito con indicador - solo para administradores */}
+            {user?.role === 'admin' && (
               <Link href="/carrito" className="relative p-2 text-white hover:text-gray-300 transition-colors">
                 <ShoppingCart className="h-6 w-6" />
                 {state.itemCount > 0 && (
@@ -155,6 +155,7 @@ export function Navbar() {
 
 function DesktopNav() {
   const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
   
   return (
     <>
@@ -162,8 +163,8 @@ function DesktopNav() {
       <NavLink href="/" label="Inicio" />
       <NavLink href="/blog" label="Blog" />
       
-      {/* Contenido solo para usuarios logueados */}
-      {user && (
+      {/* Contenido solo para administradores */}
+      {isAdmin && (
         <>
           <NavLink href="/tienda" label="Tienda" />
           <NavLink href="/dashboard" label="Dashboard" />
@@ -211,7 +212,7 @@ function MobileSidebar() {
         <div className="space-y-1">
           <NavItem href="/" icon={Home} label="Inicio" />
           <NavItem href="/blog" icon={BookOpen} label="Blog" />
-          {user && (
+          {user?.role === 'admin' && (
             <>
               <NavItem href="/tienda" icon={ShoppingBag} label="Tienda" />
               <NavItem href="/dashboard" icon={Settings} label="Dashboard" />

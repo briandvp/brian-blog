@@ -3,10 +3,13 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 
+type Role = 'ADMIN' | 'AUTHOR' | 'USER'
+
 interface User {
   id: string
   email: string
   name?: string
+  role: Role
 }
 
 interface AuthContextType {

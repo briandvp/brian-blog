@@ -7,11 +7,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  ADMIN
+  AUTHOR
+  USER
+}
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
   name      String?
   password  String
+  role      Role     @default(USER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   posts     Post[]
@@ -53,6 +60,17 @@ model Comment {
   post      Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@map("comments")
+}
+
+model AuthorizedEmail {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  role      Role     @default(AUTHOR)
+  createdAt DateTime @default(now())
+  createdBy String   // ID del admin que autorizó
+  active    Boolean  @default(true)
+
+  @@map("authorized_emails")
 }
 
 enum CommentStatus {
