@@ -1,6 +1,8 @@
+"use client"
+
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { useAuth } from '@/contexts/auth-context'
+import { RefreshCw } from 'lucide-react'
 
 interface AuthorizedEmail {
   id: string
@@ -11,11 +13,11 @@ interface AuthorizedEmail {
 }
 
 export default function AuthorizedEmailsPage() {
-  const { user } = useAuth()
   const [emails, setEmails] = useState<AuthorizedEmail[]>([])
   const [newEmail, setNewEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [isFetching, setIsFetching] = useState(false)
 
   useEffect(() => {
     fetchEmails()
@@ -23,7 +25,8 @@ export default function AuthorizedEmailsPage() {
 
   const fetchEmails = async () => {
     try {
-      const response = await fetch('/api/auth/authorized-emails')
+      setIsFetching(true)
+      const response = await fetch('/api/auth/authorized-emails', { credentials: 'include' })
       const data = await response.json()
       if (response.ok) {
         setEmails(data)
@@ -32,6 +35,8 @@ export default function AuthorizedEmailsPage() {
       }
     } catch (error) {
       setError('Error al cargar los emails')
+    } finally {
+      setIsFetching(false)
     }
   }
 
@@ -46,6 +51,7 @@ export default function AuthorizedEmailsPage() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({ email: newEmail }),
       })
 
@@ -71,6 +77,7 @@ export default function AuthorizedEmailsPage() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({ id }),
       })
 
@@ -85,18 +92,21 @@ export default function AuthorizedEmailsPage() {
     }
   }
 
-  if (!user || user.role !== 'ADMIN') {
-    return (
-      <div className="p-6">
-        <h1 className="text-2xl font-bold mb-4">No autorizado</h1>
-        <p>No tienes permiso para ver esta página.</p>
-      </div>
-    )
-  }
-
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Gestión de Correos Autorizados</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold">Gestión de Correos Autorizados</h1>
+        <Button
+          onClick={fetchEmails}
+          variant="outline"
+          size="sm"
+          className="flex items-center gap-2"
+          disabled={isFetching}
+        >
+          <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
+          {isFetching ? 'Actualizando...' : 'Actualizar'}
+        </Button>
+      </div>
       
       {/* Formulario para añadir nuevo email */}
       <form onSubmit={handleAddEmail} className="mb-8">

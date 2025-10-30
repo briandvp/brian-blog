@@ -17,6 +17,7 @@ const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Publicaciones", href: "/dashboard/posts", icon: FileText },
   { name: "Nueva publicación", href: "/dashboard/posts/new", icon: Plus },
+  { name: "Usuarios", href: "/dashboard/users", icon: Users },
   { name: "Comentarios", href: "/dashboard/comments", icon: Users },
   { name: "Analíticas", href: "/dashboard/analytics", icon: BarChart3 },
   { name: "Configuración", href: "/dashboard/settings", icon: Settings },

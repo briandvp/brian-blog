@@ -89,10 +89,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const logout = () => {
-    setUser(null)
-    localStorage.removeItem('user')
-    // Redirigir a la página de login después del logout
-    router.push('/')
+    fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
+      .catch(() => {})
+      .finally(() => {
+        setUser(null)
+        localStorage.removeItem('user')
+        // Redirigir a la página de inicio después del logout
+        router.push('/')
+      })
   }
 
   return (

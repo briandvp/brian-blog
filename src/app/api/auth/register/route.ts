@@ -30,10 +30,19 @@ export async function POST(request: NextRequest) {
 
     const user = await createUser(email, password, name)
 
-    return NextResponse.json({
+    // Establecer cookie de sesión tras el registro
+    const response = NextResponse.json({
       message: 'Usuario creado exitosamente',
       user,
     })
+    response.cookies.set('session', user.id, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7, // 7 días
+    })
+    return response
   } catch (error) {
     console.error('Error en registro:', error)
     return NextResponse.json(

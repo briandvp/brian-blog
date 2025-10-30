@@ -21,12 +21,19 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // En un caso real, aquí generarías un JWT token
-    // Por ahora, retornamos los datos del usuario
-    return NextResponse.json({
+    // Establecer cookie de sesión simple basada en el id del usuario
+    const response = NextResponse.json({
       message: 'Login exitoso',
       user,
     })
+    response.cookies.set('session', user.id, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7, // 7 días
+    })
+    return response
   } catch (error) {
     console.error('Error en login:', error)
     return NextResponse.json(
