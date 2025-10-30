@@ -54,15 +54,17 @@ export function Navbar() {
 
           {/* Carrito y acciones */}
           <div className="flex items-center space-x-4">
-            {/* Carrito con indicador */}
-            <Link href="/carrito" className="relative p-2 text-white hover:text-gray-300 transition-colors">
-              <ShoppingCart className="h-6 w-6" />
-              {state.itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
-                  {state.itemCount}
-                </span>
-              )}
-            </Link>
+            {/* Carrito con indicador - solo para usuarios logueados */}
+            {user && (
+              <Link href="/carrito" className="relative p-2 text-white hover:text-gray-300 transition-colors">
+                <ShoppingCart className="h-6 w-6" />
+                {state.itemCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                    {state.itemCount}
+                  </span>
+                )}
+              </Link>
+            )}
             
             {/* Autenticación */}
             {user ? (
@@ -156,17 +158,18 @@ function DesktopNav() {
   
   return (
     <>
-      {/* Contenido Principal */}
+      {/* Contenido Principal - visible para todos */}
       <NavLink href="/" label="Inicio" />
       <NavLink href="/blog" label="Blog" />
       
-      {/* Enlace para crear posts (solo para usuarios autenticados) */}
+      {/* Contenido solo para usuarios logueados */}
       {user && (
-        <NavLink href="/dashboard/posts/new" label="Nueva Publicación" />
+        <>
+          <NavLink href="/tienda" label="Tienda" />
+          <NavLink href="/dashboard" label="Dashboard" />
+          <NavLink href="/dashboard/posts/new" label="Nueva Publicación" />
+        </>
       )}
-      
-      {/* Servicios */}
-      <NavLink href="/tienda" label="Tienda" />
     </>
   );
 }
@@ -209,12 +212,15 @@ function MobileSidebar() {
           <NavItem href="/" icon={Home} label="Inicio" />
           <NavItem href="/blog" icon={BookOpen} label="Blog" />
           {user && (
-            <NavItem href="/dashboard/posts/new" icon={Plus} label="Nueva Publicación" />
+            <>
+              <NavItem href="/tienda" icon={ShoppingBag} label="Tienda" />
+              <NavItem href="/dashboard" icon={Settings} label="Dashboard" />
+              <NavItem href="/dashboard/posts/new" icon={Plus} label="Nueva Publicación" />
+            </>
           )}
         </div>
 
         <div className="pt-4 space-y-1 border-t border-gray-600/50">
-          <CartNavItem href="/tienda" icon={ShoppingBag} label="Tienda" />
           {user ? (
             <button
               onClick={logout}
