@@ -10,7 +10,8 @@ import {
   Settings, 
   Plus,
   Eye,
-  Edit
+  Edit,
+  ShoppingBag
 } from "lucide-react";
 
 const navigation = [
@@ -19,6 +20,7 @@ const navigation = [
   { name: "Nueva publicación", href: "/dashboard/posts/new", icon: Plus },
   { name: "Usuarios", href: "/dashboard/users", icon: Users },
   { name: "Comentarios", href: "/dashboard/comments", icon: Users },
+  { name: "Tienda", href: "/dashboard/store", icon: ShoppingBag },
   { name: "Analíticas", href: "/dashboard/analytics", icon: BarChart3 },
   { name: "Configuración", href: "/dashboard/settings", icon: Settings },
 ];

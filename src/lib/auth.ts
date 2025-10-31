@@ -5,7 +5,7 @@ import { NextRequest } from 'next/server'
 
 import { Role } from '@prisma/client'
 
-interface AuthUser {
+export interface AuthUser {
   id: string
   email: string
   name?: string | null

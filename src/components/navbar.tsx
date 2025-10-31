@@ -55,16 +55,14 @@ export function Navbar() {
           {/* Carrito y acciones */}
           <div className="flex items-center space-x-4">
             {/* Carrito con indicador - solo para administradores */}
-            {user?.role === 'admin' && (
-              <Link href="/carrito" className="relative p-2 text-white hover:text-gray-300 transition-colors">
-                <ShoppingCart className="h-6 w-6" />
-                {state.itemCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
-                    {state.itemCount}
-                  </span>
-                )}
-              </Link>
-            )}
+            <Link href="/carrito" className="relative p-2 text-white hover:text-gray-300 transition-colors">
+              <ShoppingCart className="h-6 w-6" />
+              {state.itemCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                  {state.itemCount}
+                </span>
+              )}
+            </Link>
             
             {/* Autenticación */}
             {user ? (
@@ -155,18 +153,18 @@ export function Navbar() {
 
 function DesktopNav() {
   const { user } = useAuth();
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = user?.role === 'ADMIN';
   
   return (
     <>
       {/* Contenido Principal - visible para todos */}
       <NavLink href="/" label="Inicio" />
       <NavLink href="/blog" label="Blog" />
+      <NavLink href="/tienda" label="Tienda" />
       
       {/* Contenido solo para administradores */}
       {isAdmin && (
         <>
-          <NavLink href="/tienda" label="Tienda" />
           <NavLink href="/dashboard" label="Dashboard" />
           <NavLink href="/dashboard/posts/new" label="Nueva Publicación" />
         </>
@@ -212,9 +210,9 @@ function MobileSidebar() {
         <div className="space-y-1">
           <NavItem href="/" icon={Home} label="Inicio" />
           <NavItem href="/blog" icon={BookOpen} label="Blog" />
-          {user?.role === 'admin' && (
+          <NavItem href="/tienda" icon={ShoppingBag} label="Tienda" />
+          {user?.role === 'ADMIN' && (
             <>
-              <NavItem href="/tienda" icon={ShoppingBag} label="Tienda" />
               <NavItem href="/dashboard" icon={Settings} label="Dashboard" />
               <NavItem href="/dashboard/posts/new" icon={Plus} label="Nueva Publicación" />
             </>

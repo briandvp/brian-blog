@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getUserFromSession } from "@/lib/auth";
+import { withAuth } from "@/lib/middleware";
+import { ADMIN_PERMISSIONS } from "@/lib/permissions";
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await getUserFromSession(request);
-
-    if (!user || user.role !== "ADMIN") {
-      return new NextResponse("Unauthorized", { status: 401 });
-    }
+    const auth = await withAuth(request, ADMIN_PERMISSIONS.MANAGE_USERS)
+    if ('error' in auth) return auth
 
     const users = await prisma.user.findMany({
       select: {

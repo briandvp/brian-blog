@@ -1,8 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/cart-context";
+import { useAuth } from "@/contexts/auth-context";
+import { hasPermission, ADMIN_PERMISSIONS } from "@/lib/permissions";
 import { 
   ShoppingCart, 
   Star, 
@@ -13,8 +16,25 @@ import {
   Coffee,
   Shirt,
   Gift,
-  Award
+  Award,
+  Edit,
+  Plus,
+  Settings
 } from "lucide-react";
+
+interface Product {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  originalPrice: number | null;
+  image: string;
+  category: string;
+  rating: number;
+  reviews: number;
+  inStock: boolean;
+  featured: boolean;
+}
 
 // Datos de ejemplo para los productos
 const mockProducts = [
@@ -102,16 +122,19 @@ export default function Tienda() {
     );
   };
 
-  const ProductCard = ({ product }: { product: any }) => (
+  const ProductCard = ({ product }: { product: Product }) => (
     <div 
       className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer"
       onClick={() => window.location.href = `/tienda/producto/${product.id}`}
     >
       <div className="relative">
-        <img 
+        <Image 
           src={product.image} 
           alt={product.name}
+          width={400}
+          height={256}
           className="w-full h-64 object-cover"
+          priority={product.featured}
         />
         {product.featured && (
           <div className="absolute top-2 left-2 bg-[#42403e] text-white px-2 py-1 text-xs font-medium rounded">
