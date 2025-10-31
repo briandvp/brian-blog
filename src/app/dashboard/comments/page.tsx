@@ -49,28 +49,48 @@ interface CommentsData {
   };
 }
 
+// Estado de carga para el skeleton loader
+interface LoadingState {
+  table: boolean;
+  action: boolean;
+}
+
 export default function Comments() {
   const [data, setData] = useState<CommentsData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<LoadingState>({
+    table: true,
+    action: false
+  });
   const [filter, setFilter] = useState("all");
   const [selectedComments, setSelectedComments] = useState<string[]>([]);
   const [page, setPage] = useState(1);
 
   const fetchComments = useCallback(async () => {
-    setLoading(true);
     try {
-      const response = await fetch(`/api/comments/admin?status=${filter}&page=${page}&limit=20`);
-      if (response.ok) {
-        const result = await response.json();
-        setData(result);
-      } else {
-        toast.error('Error al cargar los comentarios');
+      setIsLoading(prev => ({ ...prev, table: true }));
+      const response = await fetch(`/api/comments/admin?status=${filter}&page=${page}&limit=20`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          toast.error("No tienes permisos para ver los comentarios");
+          return;
+        }
+        throw new Error(`Error: ${response.status}`);
       }
+
+      const result = await response.json();
+      setData(result);
     } catch (error) {
       console.error('Error fetching comments:', error);
       toast.error('Error al cargar los comentarios');
     } finally {
-      setLoading(false);
+      setIsLoading(prev => ({ ...prev, table: false }));
     }
   }, [filter, page]);
 
@@ -202,13 +222,37 @@ export default function Comments() {
     });
   };
 
-  if (loading && !data) {
+  if (isLoading.table && !data) {
     return (
       <div className="p-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#D4AF37] mx-auto"></div>
-            <p className="text-gray-600 mt-4">Cargando comentarios...</p>
+        <div className="max-w-7xl mx-auto space-y-4">
+          {/* Header Skeleton */}
+          <div className="h-8 bg-gray-200 rounded w-1/4 animate-pulse"></div>
+          <div className="h-4 bg-gray-200 rounded w-2/4 animate-pulse"></div>
+          
+          {/* Stats Cards Skeleton */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 my-8">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="bg-white rounded-lg shadow p-6">
+                <div className="h-8 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+                <div className="h-6 bg-gray-200 rounded w-1/4 mt-2 animate-pulse"></div>
+              </div>
+            ))}
+          </div>
+
+          {/* Table Skeleton */}
+          <div className="bg-white rounded-lg shadow">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="border-b p-4">
+                <div className="flex justify-between items-center">
+                  <div className="w-3/4 space-y-2">
+                    <div className="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+                    <div className="h-3 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+                  </div>
+                  <div className="h-8 bg-gray-200 rounded w-24 animate-pulse"></div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -246,9 +290,9 @@ export default function Comments() {
                 variant="outline"
                 size="sm"
                 onClick={fetchComments}
-                disabled={loading}
+                disabled={isLoading.table}
               >
-                <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                <RefreshCw className={`h-4 w-4 mr-2 ${isLoading.table ? 'animate-spin' : ''}`} />
                 Actualizar
               </Button>
               <Filter className="h-5 w-5 text-gray-400" />
@@ -370,10 +414,26 @@ export default function Comments() {
           </div>
           
           <div className="divide-y divide-gray-200">
-            {loading ? (
-              <div className="p-8 text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#D4AF37] mx-auto"></div>
-                <p className="text-gray-600 mt-2">Cargando comentarios...</p>
+            {isLoading.table ? (
+              <div className="divide-y divide-gray-200">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="p-6">
+                    <div className="flex items-start space-x-4">
+                      <div className="h-4 w-4 bg-gray-200 rounded animate-pulse"></div>
+                      <div className="flex-1 space-y-3">
+                        <div className="flex items-center space-x-2">
+                          <div className="h-4 w-1/4 bg-gray-200 rounded animate-pulse"></div>
+                          <div className="h-4 w-1/3 bg-gray-200 rounded animate-pulse"></div>
+                        </div>
+                        <div className="h-16 bg-gray-200 rounded animate-pulse"></div>
+                        <div className="flex space-x-2">
+                          <div className="h-8 w-20 bg-gray-200 rounded animate-pulse"></div>
+                          <div className="h-8 w-20 bg-gray-200 rounded animate-pulse"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : data.comments.length === 0 ? (
               <div className="p-8 text-center">
