@@ -17,24 +17,39 @@ export default function DashboardLayout({
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) {
-      setIsLoading(true);
-      return;
-    }
+    const checkAuth = async () => {
+      // Si el usuario no está autenticado
+      if (!user) {
+        toast.error('Debes iniciar sesión para acceder al dashboard');
+        router.push('/');
+        return;
+      }
 
-    if (!['ADMIN', 'AUTHOR'].includes(user.role)) {
-      toast.error('No tienes permisos para acceder al dashboard');
-      router.push('/');
-      return;
-    }
+      // Si el usuario no tiene los permisos necesarios
+      if (!['ADMIN', 'AUTHOR'].includes(user.role)) {
+        toast.error('No tienes permisos para acceder al dashboard');
+        router.push('/');
+        return;
+      }
 
-    setIsLoading(false);
+      // Si todo está bien, quitar el loading
+      setIsLoading(false);
+    };
+
+    // Ejecutar la verificación de autenticación
+    checkAuth();
   }, [user, router]);
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+        <div className="relative">
+          <Loader2 className="h-12 w-12 animate-spin text-[#42403e]" />
+          <div className="absolute inset-0 h-12 w-12 animate-ping opacity-20">
+            <Loader2 className="h-12 w-12 text-[#42403e]" />
+          </div>
+        </div>
+        <p className="mt-4 text-gray-600 font-medium">Cargando dashboard...</p>
       </div>
     );
   }

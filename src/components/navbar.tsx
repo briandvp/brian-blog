@@ -52,9 +52,9 @@ export function Navbar() {
             <DesktopNav />
           </nav>
 
-          {/* Carrito y acciones */}
-          <div className="flex items-center space-x-4">
-            {/* Carrito con indicador - solo para administradores */}
+          {/* Carrito y acciones - Desktop */}
+          <div className="hidden lg:flex items-center space-x-4">
+            {/* Carrito con indicador */}
             <Link href="/carrito" className="relative p-2 text-white hover:text-gray-300 transition-colors">
               <ShoppingCart className="h-6 w-6" />
               {state.itemCount > 0 && (
@@ -64,7 +64,7 @@ export function Navbar() {
               )}
             </Link>
             
-            {/* Autenticación */}
+            {/* Autenticación - Desktop */}
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -118,7 +118,19 @@ export function Navbar() {
             </p>
           </div>
 
-          <div className="flex lg:hidden">
+          {/* Carrito y hamburguesa - solo móvil, lado derecho */}
+          <div className="flex lg:hidden items-center space-x-2">
+            {/* Carrito con indicador - móvil */}
+            <Link href="/carrito" className="relative p-2 text-white hover:text-gray-300 transition-colors">
+              <ShoppingCart className="h-6 w-6" />
+              {state.itemCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                  {state.itemCount}
+                </span>
+              )}
+            </Link>
+
+            {/* Menú hamburguesa - solo móvil */}
             <Sheet>
               <SheetTrigger asChild>
                 <Button 
@@ -218,6 +230,28 @@ function MobileSidebar() {
             </>
           )}
         </div>
+
+        {/* Perfil del usuario */}
+        {user && (
+          <div className="pt-4 space-y-1 border-t border-gray-600/50">
+            <div className="px-3 py-3 mb-2">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center">
+                  <User className="h-5 w-5 text-white" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-white font-medium text-sm">{user.name || user.email}</p>
+                  <p className="text-gray-400 text-xs">{user.email}</p>
+                </div>
+              </div>
+            </div>
+            
+            <NavItem href="/mi-cuenta" icon={User} label="Mi cuenta" />
+            {(user.role === 'ADMIN' || user.role === 'AUTHOR') && (
+              <NavItem href="/dashboard" icon={Settings} label="Dashboard" />
+            )}
+          </div>
+        )}
 
         <div className="pt-4 space-y-1 border-t border-gray-600/50">
           {user ? (

@@ -43,13 +43,13 @@ export function DashboardSidebar() {
               <li key={item.name}>
                 <Link
                   href={item.href}
-                  className={`flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                  className={`flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
                     isActive
-                      ? "bg-[#42403e] text-white"
-                      : "text-gray-700 hover:bg-gray-100"
+                      ? "bg-[#42403e] text-white shadow-md"
+                      : "text-gray-700 hover:bg-gray-100 hover:translate-x-1"
                   }`}
                 >
-                  <item.icon className="h-5 w-5 mr-3" />
+                  <item.icon className={`h-5 w-5 mr-3 ${isActive ? 'text-white' : 'text-gray-500'}`} />
                   {item.name}
                 </Link>
               </li>
@@ -66,21 +66,21 @@ export function DashboardSidebar() {
         <div className="space-y-2">
           <Link
             href="/dashboard/posts/new"
-            className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-all duration-200 hover:translate-x-1"
           >
             <Plus className="h-4 w-4 mr-3" />
             Crear publicación
           </Link>
           <Link
             href="/dashboard/posts"
-            className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-all duration-200 hover:translate-x-1"
           >
             <Edit className="h-4 w-4 mr-3" />
             Gestionar posts
           </Link>
           <Link
             href="/"
-            className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-all duration-200 hover:translate-x-1"
           >
             <Eye className="h-4 w-4 mr-3" />
             Ver blog

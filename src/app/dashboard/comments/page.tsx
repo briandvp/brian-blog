@@ -227,32 +227,49 @@ export default function Comments() {
       <div className="p-8">
         <div className="max-w-7xl mx-auto space-y-4">
           {/* Header Skeleton */}
-          <div className="h-8 bg-gray-200 rounded w-1/4 animate-pulse"></div>
-          <div className="h-4 bg-gray-200 rounded w-2/4 animate-pulse"></div>
+          <div className="space-y-2">
+            <div className="h-8 bg-gray-200 rounded w-1/4 animate-pulse"></div>
+            <div className="h-4 bg-gray-200 rounded w-2/4 animate-pulse"></div>
+          </div>
           
           {/* Stats Cards Skeleton */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 my-8">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-white rounded-lg shadow p-6">
-                <div className="h-8 bg-gray-200 rounded w-1/2 animate-pulse"></div>
-                <div className="h-6 bg-gray-200 rounded w-1/4 mt-2 animate-pulse"></div>
+              <div key={i} className="bg-white rounded-lg shadow-md p-6 border-l-4 border-gray-300">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="h-12 w-12 bg-gray-200 rounded-lg animate-pulse"></div>
+                    <div className="ml-4 space-y-2">
+                      <div className="h-4 bg-gray-200 rounded w-24 animate-pulse"></div>
+                      <div className="h-6 bg-gray-200 rounded w-16 animate-pulse"></div>
+                    </div>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
 
           {/* Table Skeleton */}
-          <div className="bg-white rounded-lg shadow">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="border-b p-4">
-                <div className="flex justify-between items-center">
-                  <div className="w-3/4 space-y-2">
-                    <div className="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
-                    <div className="h-3 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <div className="h-6 bg-gray-200 rounded w-1/3 animate-pulse"></div>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="p-4">
+                  <div className="flex justify-between items-center">
+                    <div className="flex-1 space-y-2">
+                      <div className="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+                      <div className="h-3 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+                    </div>
+                    <div className="flex space-x-2">
+                      <div className="h-8 bg-gray-200 rounded w-20 animate-pulse"></div>
+                      <div className="h-8 bg-gray-200 rounded w-20 animate-pulse"></div>
+                    </div>
                   </div>
-                  <div className="h-8 bg-gray-200 rounded w-24 animate-pulse"></div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </div>

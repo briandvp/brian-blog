@@ -49,8 +49,22 @@ export async function GET(request: NextRequest) {
       spam: stats.find(s => s.status === 'SPAM')?._count.status || 0
     };
 
+    // Transformar comentarios para que las fechas sean strings ISO
+    const transformedComments = comments.map(comment => ({
+      id: comment.id,
+      content: comment.content,
+      author: comment.author,
+      email: comment.email,
+      status: comment.status,
+      isReply: comment.isReply,
+      parentId: comment.parentId,
+      createdAt: comment.createdAt.toISOString(),
+      updatedAt: comment.updatedAt.toISOString(),
+      post: comment.post
+    }));
+
     return NextResponse.json({
-      comments,
+      comments: transformedComments,
       pagination: {
         page,
         limit,

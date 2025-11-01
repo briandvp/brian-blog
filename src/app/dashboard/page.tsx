@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, FileText, Eye, Edit, Trash2, Calendar, User, Loader2 } from "lucide-react";
+import { Plus, FileText, Eye, Edit, Trash2, Calendar, MessageSquare } from "lucide-react";
 import { CreatePostModal } from "@/components/dashboard/create-post-modal";
 import { EditPostModal } from "@/components/dashboard/edit-post-modal";
+import { TableSkeleton, CardSkeleton } from "@/components/dashboard/skeleton-loader";
 
 interface Post {
   id: string;
@@ -163,41 +164,49 @@ export default function Dashboard() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <FileText className="h-8 w-8 text-blue-600" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Publicaciones publicadas</p>
-                <p className="text-2xl font-bold text-gray-900">{posts.length}</p>
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <CardSkeleton />
+            <CardSkeleton />
+            <CardSkeleton />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center">
+                <FileText className="h-8 w-8 text-blue-600" />
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Publicaciones</p>
+                  <p className="text-2xl font-bold text-gray-900">{posts.length}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center">
+                <Eye className="h-8 w-8 text-green-600" />
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Vistas totales</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {posts.reduce((sum, post) => sum + post.views, 0).toLocaleString()}
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center">
+                <MessageSquare className="h-8 w-8 text-purple-600" />
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Comentarios</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {posts.reduce((sum, post) => sum + post.comments, 0)}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-          
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <Eye className="h-8 w-8 text-green-600" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Vistas totales</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {posts.reduce((sum, post) => sum + post.views, 0).toLocaleString()}
-                </p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <Calendar className="h-8 w-8 text-purple-600" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Comentarios totales</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {posts.reduce((sum, post) => sum + post.comments, 0)}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+        )}
 
         {/* Posts Table */}
         <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -206,14 +215,7 @@ export default function Dashboard() {
           </div>
           
           {loading ? (
-            <div className="text-center py-12">
-              <div className="text-gray-400 mb-4">
-                <Loader2 className="h-12 w-12 mx-auto animate-spin" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                Cargando publicaciones...
-              </h3>
-            </div>
+            <TableSkeleton rows={5} />
           ) : posts.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-gray-400 mb-4">

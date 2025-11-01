@@ -6,6 +6,7 @@ import { Plus, Search, Filter, Grid, List, Loader2 } from "lucide-react";
 import { CreatePostModal } from "@/components/dashboard/create-post-modal";
 import { EditPostModal } from "@/components/dashboard/edit-post-modal";
 import { PostCard } from "@/components/dashboard/post-card";
+import { PostCardSkeleton } from "@/components/dashboard/skeleton-loader";
 
 interface Post {
   id: string;
@@ -210,14 +211,23 @@ export default function PostsPage() {
 
         {/* Posts Grid/List */}
         {loading ? (
-          <div className="text-center py-12">
-            <div className="text-gray-400 mb-4">
-              <Loader2 className="h-12 w-12 mx-auto animate-spin" />
+          viewMode === 'grid' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <PostCardSkeleton />
+              <PostCardSkeleton />
+              <PostCardSkeleton />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Cargando publicaciones...
-            </h3>
-          </div>
+          ) : (
+            <div className="space-y-4">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="animate-pulse bg-white rounded-lg shadow p-6">
+                  <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                </div>
+              ))}
+            </div>
+          )
         ) : filteredPosts.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-gray-400 mb-4">

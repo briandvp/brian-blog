@@ -12,8 +12,9 @@ import {
   RefreshCw,
   Filter,
   User as UserIcon,
-  Settings
+  Calendar
 } from "lucide-react";
+import { CardSkeleton } from "@/components/dashboard/skeleton-loader";
 
 interface UserStats {
   total: number;
@@ -22,24 +23,31 @@ interface UserStats {
   user: number;
 }
 
+interface LoadingState {
+  table: boolean;
+  action: boolean;
+}
+
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  
+  const [isLoading, setIsLoading] = useState<LoadingState>({
+    table: true,
+    action: false
+  });
+  const [filter, setFilter] = useState<string>("all");
 
   const fetchUsers = useCallback(async () => {
     try {
-      setIsLoading(true);
+      setIsLoading(prev => ({ ...prev, table: true }));
       const response = await fetch("/api/users", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include", // Importante para enviar las cookies de sesión
+        credentials: "include",
       });
 
       if (!response.ok) {
-        // Si el error es 401, significa que no estamos autorizados
         if (response.status === 401) {
           toast.error("No tienes permisos para ver los usuarios");
           return;
@@ -57,12 +65,13 @@ export default function UsersPage() {
           : "Error al cargar los usuarios"
       );
     } finally {
-      setIsLoading(false);
+      setIsLoading(prev => ({ ...prev, table: false }));
     }
   }, []);
 
   const handleRoleChange = async (userId: string, newRole: string) => {
     try {
+      setIsLoading(prev => ({ ...prev, action: true }));
       const response = await fetch(`/api/users/${userId}`, {
         method: "PATCH",
         headers: {
@@ -74,13 +83,15 @@ export default function UsersPage() {
 
       if (response.ok) {
         toast.success("Rol actualizado correctamente");
-        fetchUsers(); // Refresh the users list
+        fetchUsers();
       } else {
         toast.error("Error al actualizar el rol");
       }
     } catch (error) {
       console.error("Error updating user role:", error);
       toast.error("Error al actualizar el rol");
+    } finally {
+      setIsLoading(prev => ({ ...prev, action: false }));
     }
   };
 
@@ -117,165 +128,227 @@ export default function UsersPage() {
     );
   };
 
+  const filteredUsers = users.filter(user => {
+    if (filter === "all") return true;
+    return user.role === filter;
+  });
+
   const stats = getStats(users);
 
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  if (isLoading.table && users.length === 0) {
+    return (
+      <div className="p-8">
+        <div className="max-w-7xl mx-auto space-y-4">
+          {/* Header Skeleton */}
+          <div className="space-y-2">
+            <div className="h-8 bg-gray-200 rounded w-1/4 animate-pulse"></div>
+            <div className="h-4 bg-gray-200 rounded w-2/4 animate-pulse"></div>
+          </div>
+          
+          {/* Stats Cards Skeleton */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 my-8">
+            <CardSkeleton />
+            <CardSkeleton />
+            <CardSkeleton />
+            <CardSkeleton />
+          </div>
+
+          {/* Table Skeleton */}
+          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <div className="h-6 bg-gray-200 rounded w-1/3 animate-pulse"></div>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="p-6">
+                  <div className="flex justify-between items-center">
+                    <div className="flex-1 space-y-2">
+                      <div className="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+                      <div className="h-3 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+                    </div>
+                    <div className="h-8 bg-gray-200 rounded w-32 animate-pulse"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-7xl mx-auto p-8">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Gestión de Usuarios</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Administra los usuarios y sus roles en la plataforma
-          </p>
-        </div>
-        <Button
-          onClick={fetchUsers}
-          variant="outline"
-          size="sm"
-          className="flex items-center gap-2"
-          disabled={isLoading}
-        >
-          <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-          {isLoading ? 'Actualizando...' : 'Actualizar'}
-        </Button>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+    <div className="p-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Total Usuarios</p>
-              <p className="text-2xl font-semibold text-gray-900">{stats.total}</p>
+              <h1 className="text-3xl font-bold text-gray-900">Usuarios</h1>
+              <p className="text-gray-600 mt-2">Gestiona los usuarios y sus roles en la plataforma</p>
             </div>
-            <Users className="h-8 w-8 text-gray-400" />
-          </div>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Administradores</p>
-              <p className="text-2xl font-semibold text-gray-900">{stats.admin}</p>
-            </div>
-            <Shield className="h-8 w-8 text-purple-400" />
-          </div>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Autores</p>
-              <p className="text-2xl font-semibold text-gray-900">{stats.author}</p>
-            </div>
-            <UserCog className="h-8 w-8 text-blue-400" />
-          </div>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Usuarios</p>
-              <p className="text-2xl font-semibold text-gray-900">{stats.user}</p>
-            </div>
-            <UserIcon className="h-8 w-8 text-gray-400" />
-          </div>
-        </div>
-      </div>
-
-      {/* Users List */}
-      <div className="bg-white shadow rounded-lg">
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <h2 className="text-lg font-semibold text-gray-900">Lista de Usuarios</h2>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center space-x-2">
               <Button
                 variant="outline"
                 size="sm"
-                className="flex items-center gap-2"
+                onClick={fetchUsers}
+                disabled={isLoading.table}
               >
-                <Filter className="h-4 w-4" />
-                Filtrar
+                <RefreshCw className={`h-4 w-4 mr-2 ${isLoading.table ? 'animate-spin' : ''}`} />
+                Actualizar
               </Button>
-              <Button variant="outline" size="sm" className="flex items-center gap-2" asChild>
-                <Link href="/dashboard/authorized-emails">
-                  <Settings className="h-4 w-4" />
-                  Configurar
-                </Link>
-              </Button>
+              <Filter className="h-5 w-5 text-gray-400" />
+              <select 
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#42403e] focus:border-transparent"
+              >
+                <option value="all">Todos</option>
+                <option value="ADMIN">Administradores</option>
+                <option value="AUTHOR">Autores</option>
+                <option value="USER">Usuarios</option>
+              </select>
             </div>
           </div>
         </div>
 
-        {isLoading ? (
-          <div className="p-8 text-center">
-            <RefreshCw className="h-8 w-8 animate-spin text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500">Cargando usuarios...</p>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <Users className="h-8 w-8 text-blue-600" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Total Usuarios</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+              </div>
+            </div>
           </div>
-        ) : users.length === 0 ? (
-          <div className="p-8 text-center">
-            <p className="text-gray-500">No hay usuarios registrados</p>
+          
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <Shield className="h-8 w-8 text-purple-600" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Administradores</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.admin}</p>
+              </div>
+            </div>
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Usuario
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Estado
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Fecha de registro
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Acciones
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {users.map((user) => (
-                  <tr key={user.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-start gap-3">
-                        <div className="flex-shrink-0">
-                          <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                            <UserIcon className="h-6 w-6 text-gray-500" />
+          
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <UserCog className="h-8 w-8 text-green-600" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Autores</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.author}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <UserIcon className="h-8 w-8 text-gray-600" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Usuarios</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.user}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Users List */}
+        <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900">
+              Lista de Usuarios {filter !== "all" && `(${filter})`}
+            </h2>
+          </div>
+          
+          {isLoading.table ? (
+            <div className="p-8 text-center">
+              <div className="h-8 w-8 animate-spin text-gray-400 mx-auto mb-4">
+                <RefreshCw className="h-8 w-8" />
+              </div>
+              <p className="text-gray-500">Cargando usuarios...</p>
+            </div>
+          ) : filteredUsers.length === 0 ? (
+            <div className="p-8 text-center">
+              <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-500">No hay usuarios registrados</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Usuario
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Estado
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Fecha de registro
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Acciones
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {filteredUsers.map((user) => (
+                    <tr key={user.id} className="hover:bg-gray-50 transition-colors duration-150">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-start gap-3">
+                          <div className="flex-shrink-0">
+                            <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                              <UserIcon className="h-6 w-6 text-gray-500" />
+                            </div>
+                          </div>
+                          <div>
+                            <div className="text-sm font-medium text-gray-900">{user.name || 'Sin nombre'}</div>
+                            <div className="text-sm text-gray-500">{user.email}</div>
                           </div>
                         </div>
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">{user.name || 'Sin nombre'}</div>
-                          <div className="text-sm text-gray-500">{user.email}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {getRoleBadge(user.role)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(user.createdAt).toLocaleDateString('es-ES', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <select
-                        value={user.role}
-                        onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                        className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm bg-white"
-                      >
-                        <option value="USER">Usuario</option>
-                        <option value="AUTHOR">Autor</option>
-                        <option value="ADMIN">Administrador</option>
-                      </select>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {getRoleBadge(user.role)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {new Date(user.createdAt).toLocaleDateString('es-ES', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <select
+                          value={user.role}
+                          onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                          disabled={isLoading.action}
+                          className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm bg-white disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <option value="USER">Usuario</option>
+                          <option value="AUTHOR">Autor</option>
+                          <option value="ADMIN">Administrador</option>
+                        </select>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/auth-context";
 
 interface Comment {
   id: string;
@@ -23,9 +24,9 @@ interface ArticleCommentsProps {
 }
 
 export function ArticleComments({ postId }: ArticleCommentsProps) {
-  // Si no se proporciona postId, usar el post principal de la página de inicio
-  const defaultPostId = "cmgr8pkw70002dl9snrgsjf5v"; // ID del post principal
-  const actualPostId = postId || defaultPostId;
+  const actualPostId = postId;
+  const { user } = useAuth();
+  const isAdminOrAuthor = user && (user.role === 'ADMIN' || user.role === 'AUTHOR');
   
   console.log('ArticleComments rendered with postId:', actualPostId);
   
@@ -37,8 +38,8 @@ export function ArticleComments({ postId }: ArticleCommentsProps) {
   // Form state
   const [formData, setFormData] = useState({
     content: '',
-    author: '',
-    email: '',
+    author: isAdminOrAuthor ? (user?.name || user?.email || '') : '',
+    email: isAdminOrAuthor ? (user?.email || '') : '',
     saveInfo: false,
     notifications: false,
     newsletter: false,
@@ -47,6 +48,11 @@ export function ArticleComments({ postId }: ArticleCommentsProps) {
 
   // Cargar comentarios
   useEffect(() => {
+    if (!actualPostId) {
+      setLoading(false);
+      return;
+    }
+
     const fetchComments = async () => {
       try {
         const response = await fetch(`/api/comments?postId=${actualPostId}&status=approved`);
@@ -65,19 +71,38 @@ export function ArticleComments({ postId }: ArticleCommentsProps) {
     fetchComments();
   }, [actualPostId]);
 
-  // Cargar datos guardados del localStorage
+  // Cargar datos guardados del localStorage (solo si no es admin/author)
   useEffect(() => {
-    const savedData = localStorage.getItem('commentFormData');
-    if (savedData) {
-      const parsed = JSON.parse(savedData);
+    if (isAdminOrAuthor) {
+      // Para admin/author, usar sus datos de sesión
       setFormData(prev => ({
         ...prev,
-        author: parsed.author || '',
-        email: parsed.email || '',
-        saveInfo: parsed.saveInfo || false
+        author: user?.name || user?.email || '',
+        email: user?.email || ''
       }));
+    } else {
+      // Para usuarios normales, cargar del localStorage
+      const savedData = localStorage.getItem('commentFormData');
+      if (savedData) {
+        const parsed = JSON.parse(savedData);
+        setFormData(prev => ({
+          ...prev,
+          author: parsed.author || '',
+          email: parsed.email || '',
+          saveInfo: parsed.saveInfo || false
+        }));
+      }
     }
-  }, []);
+  }, [isAdminOrAuthor, user]);
+
+  // Si no se proporciona postId, mostrar mensaje al final después de todos los hooks
+  if (!postId) {
+    return (
+      <div id="comments" className="mt-16 border-t pt-10">
+        <p className="text-gray-600">No se puede cargar los comentarios. ID del post no encontrado.</p>
+      </div>
+    );
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
@@ -95,10 +120,18 @@ export function ArticleComments({ postId }: ArticleCommentsProps) {
     console.log('Post ID:', actualPostId);
     console.log('Replying to:', replyingTo);
     
-    if (!formData.content || !formData.author || !formData.email || !formData.privacy) {
-      console.log('Validation failed');
-      toast.error('Por favor completa todos los campos obligatorios');
-      return;
+    // Validación diferente para admin/author
+    if (isAdminOrAuthor) {
+      if (!formData.content) {
+        toast.error('Por favor escribe tu comentario');
+        return;
+      }
+    } else {
+      if (!formData.content || !formData.author || !formData.email || !formData.privacy) {
+        console.log('Validation failed');
+        toast.error('Por favor completa todos los campos obligatorios');
+        return;
+      }
     }
 
     if (!actualPostId) {
@@ -139,18 +172,37 @@ export function ArticleComments({ postId }: ArticleCommentsProps) {
 
       if (response.ok) {
         const newComment = await response.json();
+        console.log('New comment received:', newComment);
         
-        if (replyingTo) {
-          // Actualizar comentarios para incluir la nueva respuesta
-          setComments(prev => prev.map(comment => 
-            comment.id === replyingTo 
-              ? { ...comment, replies: [...(comment.replies || []), newComment] }
-              : comment
-          ));
-        } else {
-          // Agregar nuevo comentario principal
-          setComments(prev => [newComment, ...prev]);
+        // Si es admin/author, el comentario se aprueba automáticamente
+        // Si es usuario normal, el comentario queda pendiente
+        if (isAdminOrAuthor && newComment.status === 'APPROVED') {
+          // Agregar el comentario aprobado inmediatamente a la lista
+          const formattedComment: Comment = {
+            id: newComment.id,
+            content: newComment.content || '',
+            author: newComment.author || '',
+            email: newComment.email || '',
+            status: newComment.status || 'APPROVED',
+            isReply: newComment.isReply || false,
+            parentId: newComment.parentId || undefined,
+            createdAt: newComment.createdAt || new Date().toISOString(),
+            replies: newComment.replies || []
+          };
+          
+          if (replyingTo) {
+            // Actualizar comentarios para incluir la nueva respuesta
+            setComments(prev => prev.map(comment => 
+              comment.id === replyingTo 
+                ? { ...comment, replies: [...(comment.replies || []), formattedComment] }
+                : comment
+            ));
+          } else {
+            // Agregar nuevo comentario principal
+            setComments(prev => [formattedComment, ...prev]);
+          }
         }
+        // Si es usuario normal, no agregar (queda pendiente de aprobación)
 
         // Guardar datos si el usuario lo solicitó
         if (formData.saveInfo) {
@@ -172,19 +224,39 @@ export function ArticleComments({ postId }: ArticleCommentsProps) {
         }));
 
         setReplyingTo(null);
-        toast.success('¡Comentario enviado! Será revisado antes de publicarse.');
+        
+        if (isAdminOrAuthor) {
+          toast.success('¡Comentario publicado!');
+        } else {
+          toast.success('¡Comentario enviado! Será revisado antes de publicarse.');
+        }
       } else {
         console.log('Response not ok, status:', response.status);
-        const errorText = await response.text();
-        console.log('Error response text:', errorText);
+        let errorMessage = 'Error al enviar el comentario';
+        
         try {
-          const error = JSON.parse(errorText);
-          console.log('Parsed error:', error);
-          toast.error(error.error || 'Error al enviar el comentario');
+          const contentType = response.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            const error = await response.json();
+            console.log('Parsed error:', error);
+            errorMessage = error.error || error.details || errorMessage;
+          } else {
+            const errorText = await response.text();
+            console.log('Error response text:', errorText);
+            if (errorText) {
+              try {
+                const error = JSON.parse(errorText);
+                errorMessage = error.error || error.details || errorMessage;
+              } catch {
+                errorMessage = errorText || errorMessage;
+              }
+            }
+          }
         } catch (parseError) {
-          console.log('Could not parse error response:', parseError);
-          toast.error('Error al enviar el comentario');
+          console.error('Could not parse error response:', parseError);
         }
+        
+        toast.error(errorMessage);
       }
     } catch (error) {
       console.error('Error submitting comment:', error);
@@ -268,87 +340,98 @@ export function ArticleComments({ postId }: ArticleCommentsProps) {
             required
           />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <input
-                type="text"
-                name="author"
-                value={formData.author}
-                onChange={handleInputChange}
-                placeholder="Nombre *"
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:border-gold focus:ring-gold focus:ring-1 outline-none transition-colors"
-                required
-              />
+          {!isAdminOrAuthor && (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <input
+                    type="text"
+                    name="author"
+                    value={formData.author}
+                    onChange={handleInputChange}
+                    placeholder="Nombre *"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:border-gold focus:ring-gold focus:ring-1 outline-none transition-colors"
+                    required
+                  />
+                </div>
+                <div>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    placeholder="Correo electrónico *"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:border-gold focus:ring-gold focus:ring-1 outline-none transition-colors"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-2">
+                <input
+                  type="checkbox"
+                  id="save-info"
+                  name="saveInfo"
+                  checked={formData.saveInfo}
+                  onChange={handleInputChange}
+                  className="h-4 w-4 mt-0.5 accent-gold cursor-pointer"
+                />
+                <label htmlFor="save-info" className="text-sm text-gray-600 cursor-pointer">
+                  Guarda mi nombre y correo electrónico en este navegador para la próxima vez que comente.
+                </label>
+              </div>
+
+              <div className="flex items-start space-x-2">
+                <input
+                  type="checkbox"
+                  id="notifications"
+                  name="notifications"
+                  checked={formData.notifications}
+                  onChange={handleInputChange}
+                  className="h-4 w-4 mt-0.5 accent-gold cursor-pointer"
+                />
+                <label htmlFor="notifications" className="text-sm text-gray-600 cursor-pointer">
+                  Avísame por correo electrónico si alguien responde a mi comentario.
+                </label>
+              </div>
+
+              <div className="flex items-start space-x-2">
+                <input
+                  type="checkbox"
+                  id="newsletter"
+                  name="newsletter"
+                  checked={formData.newsletter}
+                  onChange={handleInputChange}
+                  className="h-4 w-4 mt-0.5 accent-gold cursor-pointer"
+                />
+                <label htmlFor="newsletter" className="text-sm text-gray-600 cursor-pointer">
+                  Quiero unirme a la familia de brian-blog y recibir gratis el ebook con más de 150 citas estoicas
+                </label>
+              </div>
+
+              <div className="flex items-start space-x-2">
+                <input
+                  type="checkbox"
+                  id="privacy"
+                  name="privacy"
+                  checked={formData.privacy}
+                  onChange={handleInputChange}
+                  className="h-4 w-4 mt-0.5 accent-gold cursor-pointer"
+                  required
+                />
+                <label htmlFor="privacy" className="text-sm text-gray-600 cursor-pointer">
+                  Acepto la <a href="/politica-privacidad/" className="text-gold hover:underline">política de privacidad</a> *
+                </label>
+              </div>
+            </>
+          )}
+
+          {isAdminOrAuthor && (
+            <div className="text-sm text-gray-600 bg-blue-50 border border-blue-200 rounded-md p-3">
+              <p>Comentando como: <strong>{formData.author}</strong> ({formData.email})</p>
+              <p className="text-xs mt-1">Tu comentario se publicará inmediatamente sin necesidad de aprobación.</p>
             </div>
-            <div>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                placeholder="Correo electrónico *"
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:border-gold focus:ring-gold focus:ring-1 outline-none transition-colors"
-                required
-              />
-            </div>
-          </div>
-
-          <div className="flex items-start space-x-2">
-            <input
-              type="checkbox"
-              id="save-info"
-              name="saveInfo"
-              checked={formData.saveInfo}
-              onChange={handleInputChange}
-              className="h-4 w-4 mt-0.5 accent-gold cursor-pointer"
-            />
-            <label htmlFor="save-info" className="text-sm text-gray-600 cursor-pointer">
-              Guarda mi nombre y correo electrónico en este navegador para la próxima vez que comente.
-            </label>
-          </div>
-
-          <div className="flex items-start space-x-2">
-            <input
-              type="checkbox"
-              id="notifications"
-              name="notifications"
-              checked={formData.notifications}
-              onChange={handleInputChange}
-              className="h-4 w-4 mt-0.5 accent-gold cursor-pointer"
-            />
-            <label htmlFor="notifications" className="text-sm text-gray-600 cursor-pointer">
-              Avísame por correo electrónico si alguien responde a mi comentario.
-            </label>
-          </div>
-
-          <div className="flex items-start space-x-2">
-            <input
-              type="checkbox"
-              id="newsletter"
-              name="newsletter"
-              checked={formData.newsletter}
-              onChange={handleInputChange}
-              className="h-4 w-4 mt-0.5 accent-gold cursor-pointer"
-            />
-            <label htmlFor="newsletter" className="text-sm text-gray-600 cursor-pointer">
-              Quiero unirme a la familia de brian-blog y recibir gratis el ebook con más de 150 citas estoicas
-            </label>
-          </div>
-
-          <div className="flex items-start space-x-2">
-            <input
-              type="checkbox"
-              id="privacy"
-              name="privacy"
-              checked={formData.privacy}
-              onChange={handleInputChange}
-              className="h-4 w-4 mt-0.5 accent-gold cursor-pointer"
-              required
-            />
-            <label htmlFor="privacy" className="text-sm text-gray-600 cursor-pointer">
-              Acepto la <a href="/politica-privacidad/" className="text-gold hover:underline">política de privacidad</a> *
-            </label>
-          </div>
+          )}
 
           <div className="text-sm text-gray-600 bg-gray-100 p-4 rounded-md border border-gray-200">
             <h4 className="font-bold mb-2 text-gray-800">Información sobre protección de datos</h4>
@@ -385,6 +468,8 @@ interface CommentComponentProps {
 }
 
 function Comment({ comment, onReply, formatDate }: CommentComponentProps) {
+  const isPending = comment.status === 'PENDING';
+  
   return (
     <div>
       <div className="flex items-start space-x-4">
@@ -394,10 +479,15 @@ function Comment({ comment, onReply, formatDate }: CommentComponentProps) {
           </AvatarFallback>
         </Avatar>
         <div className="flex-1">
-          <div className="bg-gray-50 rounded-lg p-4">
+          <div className={`rounded-lg p-4 ${isPending ? 'bg-yellow-50 border border-yellow-200' : 'bg-gray-50'}`}>
             <div className="flex flex-wrap items-center gap-2 mb-2">
               <span className="font-semibold">{comment.author}</span>
               <span className="text-sm text-gray-500">{formatDate(comment.createdAt)}</span>
+              {isPending && (
+                <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
+                  Pendiente de aprobación
+                </span>
+              )}
             </div>
             <p className="text-gray-700 whitespace-pre-wrap">{comment.content}</p>
           </div>

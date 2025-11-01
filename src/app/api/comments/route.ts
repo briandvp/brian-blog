@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getUserFromSession } from '@/lib/auth';
 
 // GET /api/comments - Obtener comentarios de un post específico
 export async function GET(request: NextRequest) {
@@ -51,13 +52,18 @@ export async function POST(request: NextRequest) {
   try {
     let body;
     try {
-      const rawBody = await request.text();
-      console.log('Raw request body:', rawBody);
-      body = JSON.parse(rawBody);
+      body = await request.json();
     } catch (parseError) {
-      console.error('JSON parse error:', parseError);
+      console.error('Error parsing JSON body:', parseError);
       return NextResponse.json(
-        { error: 'Formato JSON inválido' },
+        { error: 'Error al procesar los datos del formulario' },
+        { status: 400 }
+      );
+    }
+    
+    if (!body) {
+      return NextResponse.json(
+        { error: 'El cuerpo de la solicitud está vacío' },
         { status: 400 }
       );
     }
@@ -67,13 +73,44 @@ export async function POST(request: NextRequest) {
     console.log('Parsed body:', body);
     console.log('postId:', postId);
 
-    // Validaciones básicas
-    if (!content || !author || !email || !postId) {
-      console.log('Validation failed:', { content: !!content, author: !!author, email: !!email, postId: !!postId });
-      return NextResponse.json(
-        { error: 'Todos los campos son requeridos' },
-        { status: 400 }
-      );
+    // Verificar si el usuario está autenticado como admin o author
+    const user = await getUserFromSession(request);
+    const isAdminOrAuthor = user && (user.role === 'ADMIN' || user.role === 'AUTHOR');
+    
+    // Si es admin/author, usar sus datos automáticamente
+    let commentAuthor = author;
+    let commentEmail = email;
+    
+    if (isAdminOrAuthor) {
+      // Para admin/author, no requerir email y author si vienen vacíos
+      commentAuthor = author || user.name || user.email || 'Administrador';
+      commentEmail = email || user.email || '';
+      
+      // Validar solo el contenido para admin/author
+      if (!content || !postId) {
+        return NextResponse.json(
+          { error: 'El contenido es requerido' },
+          { status: 400 }
+        );
+      }
+    } else {
+      // Para usuarios normales, validar todos los campos
+      if (!content || !author || !email || !postId) {
+        console.log('Validation failed:', { content: !!content, author: !!author, email: !!email, postId: !!postId });
+        return NextResponse.json(
+          { error: 'Todos los campos son requeridos' },
+          { status: 400 }
+        );
+      }
+      
+      // Validar formato de email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return NextResponse.json(
+          { error: 'El formato del correo electrónico no es válido' },
+          { status: 400 }
+        );
+      }
     }
 
     // Verificar que el post existe
@@ -89,15 +126,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Crear el comentario
+    // Si es admin/author, aprobar automáticamente; si no, dejarlo pendiente
+    const commentStatus = isAdminOrAuthor ? 'APPROVED' : 'PENDING';
+    
     const comment = await prisma.comment.create({
       data: {
-        content,
-        author,
-        email,
+        content: content.trim(),
+        author: commentAuthor.trim(),
+        email: commentEmail.trim().toLowerCase(),
         postId,
         parentId: parentId || null,
         isReply: !!parentId,
-        status: 'PENDING'
+        status: commentStatus
       },
       include: {
         post: {
@@ -119,10 +159,30 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(comment, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating comment:', error);
+    console.error('Error details:', {
+      message: error?.message,
+      code: error?.code,
+      meta: error?.meta
+    });
+    
+    // Si es un error de Prisma, proporcionar más información
+    if (error?.code) {
+      return NextResponse.json(
+        { 
+          error: 'Error al crear el comentario',
+          details: error.message 
+        },
+        { status: 500 }
+      );
+    }
+    
     return NextResponse.json(
-      { error: 'Error interno del servidor' },
+      { 
+        error: 'Error interno del servidor',
+        details: error?.message || 'Error desconocido'
+      },
       { status: 500 }
     );
   }
