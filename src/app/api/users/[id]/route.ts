@@ -4,7 +4,7 @@ import { getUserFromSession } from "@/lib/auth";
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getUserFromSession(request);
@@ -14,6 +14,7 @@ export async function PATCH(
     }
 
     const { role } = await request.json();
+    const { id } = await params;
 
     // Validate role
     if (!["USER", "AUTHOR", "ADMIN"].includes(role)) {
@@ -21,12 +22,12 @@ export async function PATCH(
     }
 
     // Don't allow changing your own role
-    if (params.id === user.id) {
+    if (id === user.id) {
       return new NextResponse("Cannot change your own role", { status: 400 });
     }
 
     const updatedUser = await prisma.user.update({
-      where: { id: params.id },
+      where: { id },
       data: { role },
       select: {
         id: true,
