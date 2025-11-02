@@ -2,10 +2,13 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/contexts/language-context";
+import { LanguageSelector } from "@/components/language-selector";
 import { 
   Settings as SettingsIcon, 
   User, 
   Globe, 
+  Languages,
   Bell, 
   Shield, 
   Palette,
@@ -15,6 +18,7 @@ import {
 } from "lucide-react";
 
 export default function Settings() {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState("general");
   const [showPassword, setShowPassword] = useState(false);
   const [settings, setSettings] = useState({
@@ -62,11 +66,12 @@ export default function Settings() {
   };
 
   const tabs = [
-    { id: "general", name: "General", icon: SettingsIcon },
-    { id: "appearance", name: "Apariencia", icon: Palette },
-    { id: "seo", name: "SEO", icon: Globe },
-    { id: "notifications", name: "Notificaciones", icon: Bell },
-    { id: "security", name: "Seguridad", icon: Shield },
+    { id: "general", name: t('dashboard.settings.tabs.general'), icon: SettingsIcon },
+    { id: "appearance", name: t('dashboard.settings.tabs.appearance'), icon: Palette },
+    { id: "language", name: t('dashboard.settings.tabs.language'), icon: Languages },
+    { id: "seo", name: t('dashboard.settings.tabs.seo'), icon: Globe },
+    { id: "notifications", name: t('dashboard.settings.tabs.notifications'), icon: Bell },
+    { id: "security", name: t('dashboard.settings.tabs.security'), icon: Shield },
   ];
 
   const renderGeneralSettings = () => (
@@ -333,6 +338,24 @@ export default function Settings() {
     </div>
   );
 
+  const renderLanguageSettings = () => (
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">{t('dashboard.settings.language.title')}</h3>
+        <p className="text-gray-600 mb-6">{t('dashboard.settings.language.description')}</p>
+        <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+          <LanguageSelector variant="desktop" />
+        </div>
+      </div>
+      
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <p className="text-sm text-blue-800">
+          {t('dashboard.settings.language.note')}
+        </p>
+      </div>
+    </div>
+  );
+
   const renderSecuritySettings = () => (
     <div className="space-y-6">
       <div>
@@ -442,6 +465,8 @@ export default function Settings() {
         return renderGeneralSettings();
       case "appearance":
         return renderAppearanceSettings();
+      case "language":
+        return renderLanguageSettings();
       case "seo":
         return renderSEOSettings();
       case "notifications":
@@ -458,8 +483,8 @@ export default function Settings() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Configuración</h1>
-          <p className="text-gray-600 mt-2">Gestiona la configuración de tu blog</p>
+          <h1 className="text-3xl font-bold text-gray-900">{t('dashboard.settings.title')}</h1>
+          <p className="text-gray-600 mt-2">{t('dashboard.settings.subtitle')}</p>
         </div>
 
         <div className="bg-white rounded-lg shadow">
@@ -498,7 +523,7 @@ export default function Settings() {
               className="bg-[#42403e] hover:bg-[#36312f] text-white"
             >
               <Save className="h-4 w-4 mr-2" />
-              Guardar cambios
+              {t('common.save')}
             </Button>
           </div>
         </div>

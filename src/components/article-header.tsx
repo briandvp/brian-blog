@@ -1,8 +1,12 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
+import { useLanguage } from "@/contexts/language-context";
 import { CalendarIcon, MessageSquare, User2 } from "lucide-react";
 
 export function ArticleHeader() {
+  const { t } = useLanguage();
   return (
     <div className="mb-12">
       <div className="relative mb-10">
@@ -15,7 +19,7 @@ export function ArticleHeader() {
             href="/categoria/principios-estoicos"
             className="bg-[#42403e] text-white px-3 py-1.5 rounded-full hover:bg-gold transition-colors duration-300 flex items-center"
           >
-            Principios 
+            {t('article.principles')} 
           </Link>
           <div className="flex items-center text-gray-600 gap-1.5">
             <CalendarIcon className="h-4 w-4" />
@@ -36,7 +40,7 @@ export function ArticleHeader() {
               href="#comments"
               className="hover:text-gold"
             >
-              10 Comments
+              10 {t('article.commentsLabel')}
             </Link>
           </div>
         </div>
@@ -70,7 +74,7 @@ export function ArticleHeader() {
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
           </svg>
-          Tabla de contenidos
+          {t('article.tableOfContents')}
         </h2>
         <ul className="space-y-3">
           {[

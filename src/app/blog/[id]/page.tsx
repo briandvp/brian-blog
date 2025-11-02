@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import { useLanguage } from '@/contexts/language-context';
 import { ArrowLeft, Calendar, User, Eye, MessageCircle, Clock } from 'lucide-react';
 import { ArticleComments } from '@/components/article-comments';
 
@@ -26,6 +27,7 @@ interface Post {
 
 export default function PostPage() {
   const params = useParams();
+  const { t, language } = useLanguage();
   const postId = params.id as string;
   
   const [post, setPost] = useState<Post | null>(null);
@@ -46,11 +48,11 @@ export default function PostPage() {
         } else {
           const errorData = await response.json();
           console.error('Error al cargar post:', errorData);
-          setError('Post no encontrado');
+          setError(t('article.postNotFound'));
         }
       } catch (error) {
         console.error('Error al cargar post:', error);
-        setError('Error al cargar el post');
+        setError(t('article.postNotFound'));
       } finally {
         setLoading(false);
       }
@@ -63,7 +65,7 @@ export default function PostPage() {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', {
+    return date.toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
@@ -104,17 +106,17 @@ export default function PostPage() {
           <div className="max-w-4xl mx-auto text-center">
             <div className="bg-white rounded-lg shadow-lg p-8">
               <h1 className="text-2xl font-bold text-gray-800 mb-4">
-                {error || 'Post no encontrado'}
+                {error || t('article.postNotFound')}
               </h1>
               <p className="text-gray-600 mb-6">
-                El post que buscas no existe o ha sido eliminado.
+                {t('article.postDeleted')}
               </p>
               <Link 
                 href="/blog"
                 className="inline-flex items-center gap-2 bg-[#D4AF37] text-white px-6 py-3 rounded-lg hover:bg-[#B8941F] transition-colors"
               >
                 <ArrowLeft className="h-4 w-4" />
-                Volver al Blog
+                {t('article.backToBlog')}
               </Link>
             </div>
           </div>
@@ -133,7 +135,7 @@ export default function PostPage() {
             className="inline-flex items-center gap-2 text-[#D4AF37] hover:text-[#B8941F] transition-colors mb-6"
           >
             <ArrowLeft className="h-4 w-4" />
-            Volver al Blog
+            {t('article.backToBlog')}
           </Link>
 
           {/* Contenido del post */}
@@ -164,15 +166,15 @@ export default function PostPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4" />
-                  <span>{calculateReadingTime(post.content)} min de lectura</span>
+                  <span>{calculateReadingTime(post.content)} {t('article.readingTime')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Eye className="h-4 w-4" />
-                  <span>{post.views} vistas</span>
+                  <span>{post.views} {t('article.views')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <MessageCircle className="h-4 w-4" />
-                  <span>{post.comments} comentarios</span>
+                  <span>{post.comments} {t('article.comments')}</span>
                 </div>
               </div>
             </div>
@@ -197,7 +199,7 @@ export default function PostPage() {
                   </div>
                   <div>
                     <p className="font-medium text-gray-800">{post.author.name}</p>
-                    <p className="text-sm text-gray-600">Autor</p>
+                    <p className="text-sm text-gray-600">{t('article.author')}</p>
                   </div>
                 </div>
                 
@@ -207,11 +209,11 @@ export default function PostPage() {
                     className="inline-flex items-center gap-2 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
                   >
                     <ArrowLeft className="h-4 w-4" />
-                    Más Posts
+                    {t('article.morePosts')}
                   </Link>
                   <button className="inline-flex items-center gap-2 bg-[#D4AF37] text-white px-4 py-2 rounded-lg hover:bg-[#B8941F] transition-colors">
                     <MessageCircle className="h-4 w-4" />
-                    Comentar
+                    {t('article.comment')}
                   </button>
                 </div>
               </div>

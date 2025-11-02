@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/contexts/language-context";
 import { 
   Calendar, 
   User, 
@@ -34,6 +35,7 @@ interface Post {
 }
 
 export default function BlogPage() {
+  const { t } = useLanguage();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -120,10 +122,10 @@ export default function BlogPage() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Blog Estoico
+            {t('blog.title')}
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Explora artículos sobre filosofía estoica, desarrollo personal y sabiduría ancestral
+            {t('blog.subtitle')}
           </p>
         </div>
 
@@ -135,7 +137,7 @@ export default function BlogPage() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <input
                 type="text"
-                placeholder="Buscar artículos..."
+                placeholder={t('blog.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#42403e] focus:border-transparent"
@@ -153,7 +155,7 @@ export default function BlogPage() {
                 >
                   {categories.map(category => (
                     <option key={category} value={category}>
-                      {category === 'all' ? 'Todas las categorías' : category}
+                      {category === 'all' ? t('blog.allCategories') : category}
                     </option>
                   ))}
                 </select>
@@ -164,10 +166,10 @@ export default function BlogPage() {
                 onChange={(e) => setSortBy(e.target.value)}
                 className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#42403e] focus:border-transparent"
               >
-                <option value="newest">Más recientes</option>
-                <option value="oldest">Más antiguos</option>
-                <option value="mostViewed">Más vistos</option>
-                <option value="mostCommented">Más comentados</option>
+                <option value="newest">{t('blog.sort.newest')}</option>
+                <option value="oldest">{t('blog.sort.oldest')}</option>
+                <option value="mostViewed">{t('blog.sort.mostViewed')}</option>
+                <option value="mostCommented">{t('blog.sort.mostCommented')}</option>
               </select>
             </div>
           </div>
@@ -181,7 +183,7 @@ export default function BlogPage() {
               <BookOpen className="h-12 w-12 mx-auto animate-spin" />
             </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Cargando artículos...
+              {t('blog.loading')}
             </h3>
           </div>
         ) : filteredAndSortedPosts.length === 0 ? (
@@ -190,12 +192,12 @@ export default function BlogPage() {
               <Search className="h-12 w-12 mx-auto" />
             </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              No se encontraron artículos
+              {t('blog.noArticles')}
             </h3>
             <p className="text-gray-600">
               {searchTerm || categoryFilter !== 'all' 
-                ? 'Intenta ajustar los filtros de búsqueda'
-                : 'Aún no hay artículos publicados'
+                ? t('blog.adjustFilters')
+                : t('blog.noArticlesYet')
               }
             </p>
           </div>
@@ -241,7 +243,7 @@ export default function BlogPage() {
                     </div>
                     <div className="flex items-center gap-1">
                       <Clock className="h-4 w-4" />
-                      <span>{getReadingTime(post.content)} min</span>
+                      <span>{getReadingTime(post.content)} {t('blog.min')}</span>
                     </div>
                   </div>
 
@@ -264,7 +266,7 @@ export default function BlogPage() {
                       className="text-[#42403e] border-[#42403e] hover:bg-[#42403e] hover:text-white"
                     >
                       <Link href={`/blog/${post.id}`}>
-                        Leer más
+                        {t('blog.readMore')}
                       </Link>
                     </Button>
                   </div>
@@ -278,10 +280,10 @@ export default function BlogPage() {
         {!loading && posts.length > 0 && (
           <div className="text-center mt-12 bg-[#42403e] rounded-lg p-8 text-white">
             <h3 className="text-2xl font-bold mb-4">
-              ¿Te gusta el contenido?
+              {t('blog.cta.title')}
             </h3>
             <p className="text-lg mb-6 opacity-90">
-              Suscríbete para recibir las últimas publicaciones sobre estoicismo
+              {t('blog.cta.subtitle')}
             </p>
             <Button
               asChild
@@ -289,7 +291,7 @@ export default function BlogPage() {
               className="bg-white text-[#42403e] hover:bg-gray-100"
             >
               <Link href="/mi-cuenta">
-                Suscribirse
+                {t('blog.cta.subscribe')}
               </Link>
             </Button>
           </div>

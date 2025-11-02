@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect } from "react";
+import { useLanguage } from "@/contexts/language-context";
 import { ArticleHeader } from "@/components/article-header";
 import { ArticleContent } from "@/components/article-content";
 import { ArticleComments } from "@/components/article-comments";
 import { ContentSidebar } from "@/components/content-sidebar";
 
 export default function Home() {
+  const { t } = useLanguage();
   const [postId, setPostId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -52,7 +54,7 @@ export default function Home() {
               {!loading && postId && <ArticleComments postId={postId} />}
               {!loading && !postId && (
                 <div className="mt-16 border-t pt-10">
-                  <p className="text-gray-600">Cargando comentarios...</p>
+                  <p className="text-gray-600">{t('article.loadingComments')}</p>
                 </div>
               )}
             </div>
@@ -68,7 +70,7 @@ export default function Home() {
               {!loading && postId && <ArticleComments postId={postId} />}
               {!loading && !postId && (
                 <div className="mt-16 border-t pt-10">
-                  <p className="text-gray-600">Cargando comentarios...</p>
+                  <p className="text-gray-600">{t('article.loadingComments')}</p>
                 </div>
               )}
             </div>

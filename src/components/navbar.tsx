@@ -8,6 +8,7 @@ import { Menu, Home, BookOpen, ShoppingBag, User, Settings, ShoppingCart, LogIn,
 import Image from "next/image";
 import { useCart } from "@/contexts/cart-context";
 import { useAuth } from "@/contexts/auth-context";
+import { useLanguage } from "@/contexts/language-context";
 import { AuthModal } from "@/components/auth/auth-modal";
 import {
   DropdownMenu,
@@ -19,6 +20,7 @@ import {
 export function Navbar() {
   const { state } = useCart();
   const { user, logout } = useAuth();
+  const { t } = useLanguage();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   
   return (
@@ -83,13 +85,13 @@ export function Navbar() {
                   <DropdownMenuItem className="hover:bg-white/10 cursor-pointer focus:bg-white/10 transition-colors">
                     <Link href="/mi-cuenta" className="w-full flex items-center gap-2">
                       <User className="h-4 w-4" />
-                      Mi cuenta
+                      {t('nav.myAccount')}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem className="hover:bg-white/10 cursor-pointer focus:bg-white/10 transition-colors">
                     <Link href="/dashboard" className="w-full flex items-center gap-2">
                       <Settings className="h-4 w-4" />
-                      Dashboard
+                      {t('nav.dashboard')}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem 
@@ -97,7 +99,7 @@ export function Navbar() {
                     className="hover:bg-white/10 cursor-pointer focus:bg-white/10 transition-colors"
                   >
                     <LogOut className="h-4 w-4" />
-                    Cerrar sesión
+                    {t('nav.logout')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -108,13 +110,13 @@ export function Navbar() {
                 className="text-white hover:text-[#D4AF37] hover:bg-white/5 transition-all duration-300 font-medium flex items-center gap-2 px-3 py-2"
               >
                 <LogIn className="h-4 w-4" />
-                Iniciar sesión
+                {t('nav.login')}
               </Button>
             )}
             
             {/* Texto de bienvenida más compacto */}
             <p className="hidden xl:block text-white text-xs italic opacity-80 max-w-xs">
-              Blog sobre estoicismo y desarrollo personal
+              {t('nav.welcomeText')}
             </p>
           </div>
 
@@ -165,20 +167,21 @@ export function Navbar() {
 
 function DesktopNav() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const isAdmin = user?.role === 'ADMIN';
   
   return (
     <>
       {/* Contenido Principal - visible para todos */}
-      <NavLink href="/" label="Inicio" />
-      <NavLink href="/blog" label="Blog" />
-      <NavLink href="/tienda" label="Tienda" />
+      <NavLink href="/" label={t('nav.home')} />
+      <NavLink href="/blog" label={t('nav.blog')} />
+      <NavLink href="/tienda" label={t('nav.store')} />
       
       {/* Contenido solo para administradores */}
       {isAdmin && (
         <>
-          <NavLink href="/dashboard" label="Dashboard" />
-          <NavLink href="/dashboard/posts/new" label="Nueva Publicación" />
+          <NavLink href="/dashboard" label={t('nav.dashboard')} />
+          <NavLink href="/dashboard/posts/new" label={t('nav.newPost')} />
         </>
       )}
     </>
@@ -200,6 +203,7 @@ function NavLink({ href, label }: { href: string; label: string }) {
 
 function MobileSidebar() {
   const { user, logout } = useAuth();
+  const { t } = useLanguage();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   return (
@@ -220,13 +224,13 @@ function MobileSidebar() {
       {/* Navigation */}
       <nav className="flex-1 py-6 px-4 space-y-2 overflow-y-auto" aria-label="Navegación móvil">
         <div className="space-y-1">
-          <NavItem href="/" icon={Home} label="Inicio" />
-          <NavItem href="/blog" icon={BookOpen} label="Blog" />
-          <NavItem href="/tienda" icon={ShoppingBag} label="Tienda" />
+          <NavItem href="/" icon={Home} label={t('nav.home')} />
+          <NavItem href="/blog" icon={BookOpen} label={t('nav.blog')} />
+          <NavItem href="/tienda" icon={ShoppingBag} label={t('nav.store')} />
           {user?.role === 'ADMIN' && (
             <>
-              <NavItem href="/dashboard" icon={Settings} label="Dashboard" />
-              <NavItem href="/dashboard/posts/new" icon={Plus} label="Nueva Publicación" />
+              <NavItem href="/dashboard" icon={Settings} label={t('nav.dashboard')} />
+              <NavItem href="/dashboard/posts/new" icon={Plus} label={t('nav.newPost')} />
             </>
           )}
         </div>
@@ -246,9 +250,9 @@ function MobileSidebar() {
               </div>
             </div>
             
-            <NavItem href="/mi-cuenta" icon={User} label="Mi cuenta" />
+            <NavItem href="/mi-cuenta" icon={User} label={t('nav.myAccount')} />
             {(user.role === 'ADMIN' || user.role === 'AUTHOR') && (
-              <NavItem href="/dashboard" icon={Settings} label="Dashboard" />
+              <NavItem href="/dashboard" icon={Settings} label={t('nav.dashboard')} />
             )}
           </div>
         )}
@@ -260,7 +264,7 @@ function MobileSidebar() {
               className="flex items-center gap-3 px-3 py-3 text-white hover:bg-white/10 rounded-lg transition-all duration-200 group w-full"
             >
               <LogOut className="h-5 w-5 text-gray-300 group-hover:text-[#D4AF37] transition-colors" />
-              <span className="font-medium group-hover:text-[#D4AF37] transition-colors">Cerrar sesión</span>
+              <span className="font-medium group-hover:text-[#D4AF37] transition-colors">{t('nav.logout')}</span>
             </button>
           ) : (
             <button
@@ -268,7 +272,7 @@ function MobileSidebar() {
               className="flex items-center gap-3 px-3 py-3 text-white hover:bg-white/10 rounded-lg transition-all duration-200 group w-full"
             >
               <LogIn className="h-5 w-5 text-gray-300 group-hover:text-[#D4AF37] transition-colors" />
-              <span className="font-medium group-hover:text-[#D4AF37] transition-colors">Iniciar sesión</span>
+              <span className="font-medium group-hover:text-[#D4AF37] transition-colors">{t('nav.login')}</span>
             </button>
           )}
         </div>

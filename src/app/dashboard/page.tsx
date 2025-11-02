@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/contexts/language-context";
 import { Plus, FileText, Eye, Edit, Trash2, Calendar, MessageSquare } from "lucide-react";
 import { CreatePostModal } from "@/components/dashboard/create-post-modal";
 import { EditPostModal } from "@/components/dashboard/edit-post-modal";
@@ -26,6 +27,7 @@ interface Post {
 }
 
 export default function Dashboard() {
+  const { t, language } = useLanguage();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -104,7 +106,7 @@ export default function Dashboard() {
   };
 
   const handleDeletePost = async (postId: string) => {
-    if (confirm('¿Estás seguro de que quieres eliminar esta publicación?')) {
+    if (confirm(t('common.confirmDelete'))) {
       try {
         const response = await fetch(`/api/posts/${postId}`, {
           method: 'DELETE',
@@ -131,9 +133,9 @@ export default function Dashboard() {
     };
     
     const labels = {
-      published: "Publicado",
-      draft: "Borrador",
-      archived: "Archivado"
+      published: t('post.status.published'),
+      draft: t('post.status.draft'),
+      archived: t('post.status.archived')
     };
 
     return (
@@ -150,15 +152,15 @@ export default function Dashboard() {
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-              <p className="text-gray-600 mt-2">Gestiona tus publicaciones y contenido</p>
+              <h1 className="text-3xl font-bold text-gray-900">{t('dashboard.main.title')}</h1>
+              <p className="text-gray-600 mt-2">{t('dashboard.main.subtitle')}</p>
             </div>
             <Button 
               onClick={() => setShowCreateModal(true)}
               className="bg-[#42403e] hover:bg-[#36312f] text-white"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Nueva publicación
+              {t('dashboard.main.newPublication')}
             </Button>
           </div>
         </div>
@@ -176,7 +178,7 @@ export default function Dashboard() {
               <div className="flex items-center">
                 <FileText className="h-8 w-8 text-blue-600" />
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Publicaciones</p>
+                  <p className="text-sm font-medium text-gray-600">{t('dashboard.main.posts')}</p>
                   <p className="text-2xl font-bold text-gray-900">{posts.length}</p>
                 </div>
               </div>
@@ -186,7 +188,7 @@ export default function Dashboard() {
               <div className="flex items-center">
                 <Eye className="h-8 w-8 text-green-600" />
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Vistas totales</p>
+                  <p className="text-sm font-medium text-gray-600">{t('dashboard.main.totalViews')}</p>
                   <p className="text-2xl font-bold text-gray-900">
                     {posts.reduce((sum, post) => sum + post.views, 0).toLocaleString()}
                   </p>
@@ -198,7 +200,7 @@ export default function Dashboard() {
               <div className="flex items-center">
                 <MessageSquare className="h-8 w-8 text-purple-600" />
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Comentarios</p>
+                  <p className="text-sm font-medium text-gray-600">{t('dashboard.main.comments')}</p>
                   <p className="text-2xl font-bold text-gray-900">
                     {posts.reduce((sum, post) => sum + post.comments, 0)}
                   </p>
@@ -211,7 +213,7 @@ export default function Dashboard() {
         {/* Posts Table */}
         <div className="bg-white rounded-lg shadow overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Publicaciones publicadas</h2>
+            <h2 className="text-lg font-semibold text-gray-900">{t('dashboard.main.publishedPosts')}</h2>
           </div>
           
           {loading ? (
@@ -222,10 +224,10 @@ export default function Dashboard() {
                 <FileText className="h-12 w-12 mx-auto" />
               </div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">
-                No hay publicaciones publicadas
+                {t('dashboard.main.noPosts')}
               </h3>
               <p className="text-gray-600">
-                Crea tu primera publicación para comenzar
+                {t('dashboard.main.createFirst')}
               </p>
             </div>
           ) : (
@@ -234,19 +236,19 @@ export default function Dashboard() {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Título
+                      {t('dashboard.main.titleCol')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Categoría
+                      {t('dashboard.main.categoryCol')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Vistas
+                      {t('dashboard.main.viewsCol')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Fecha
+                      {t('dashboard.main.dateCol')}
                     </th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Acciones
+                      {t('dashboard.main.actionsCol')}
                     </th>
                   </tr>
                 </thead>
@@ -270,7 +272,7 @@ export default function Dashboard() {
                       {post.views.toLocaleString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(post.createdAt).toLocaleDateString('es-ES')}
+                      {new Date(post.createdAt).toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US')}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center justify-end space-x-2">
