@@ -88,12 +88,14 @@ export function Navbar() {
                       {t('nav.myAccount')}
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-white/10 cursor-pointer focus:bg-white/10 transition-colors">
-                    <Link href="/dashboard" className="w-full flex items-center gap-2">
-                      <Settings className="h-4 w-4" />
-                      {t('nav.dashboard')}
-                    </Link>
-                  </DropdownMenuItem>
+                  {(user.role === 'ADMIN' || user.role === 'AUTHOR') && (
+                    <DropdownMenuItem className="hover:bg-white/10 cursor-pointer focus:bg-white/10 transition-colors">
+                      <Link href="/dashboard" className="w-full flex items-center gap-2">
+                        <Settings className="h-4 w-4" />
+                        {t('nav.dashboard')}
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem 
                     onClick={logout}
                     className="hover:bg-white/10 cursor-pointer focus:bg-white/10 transition-colors"
@@ -105,12 +107,14 @@ export function Navbar() {
               </DropdownMenu>
             ) : (
               <Button 
-                onClick={() => setIsAuthModalOpen(true)}
+                asChild
                 variant="ghost" 
                 className="text-white hover:text-[#D4AF37] hover:bg-white/5 transition-all duration-300 font-medium flex items-center gap-2 px-3 py-2"
               >
-                <LogIn className="h-4 w-4" />
-                {t('nav.login')}
+                <Link href="/suscribirse">
+                  <LogIn className="h-4 w-4" />
+                  {t('nav.subscribe')}
+                </Link>
               </Button>
             )}
             
@@ -169,13 +173,18 @@ function DesktopNav() {
   const { user } = useAuth();
   const { t } = useLanguage();
   const isAdmin = user?.role === 'ADMIN';
+  const canAccessStore = user?.role === 'ADMIN' || user?.role === 'AUTHOR';
   
   return (
     <>
       {/* Contenido Principal - visible para todos */}
       <NavLink href="/" label={t('nav.home')} />
       <NavLink href="/blog" label={t('nav.blog')} />
-      <NavLink href="/tienda" label={t('nav.store')} />
+      
+      {/* Tienda solo para ADMIN y AUTHOR */}
+      {canAccessStore && (
+        <NavLink href="/tienda" label={t('nav.store')} />
+      )}
       
       {/* Contenido solo para administradores */}
       {isAdmin && (
@@ -226,7 +235,9 @@ function MobileSidebar() {
         <div className="space-y-1">
           <NavItem href="/" icon={Home} label={t('nav.home')} />
           <NavItem href="/blog" icon={BookOpen} label={t('nav.blog')} />
-          <NavItem href="/tienda" icon={ShoppingBag} label={t('nav.store')} />
+          {(user?.role === 'ADMIN' || user?.role === 'AUTHOR') && (
+            <NavItem href="/tienda" icon={ShoppingBag} label={t('nav.store')} />
+          )}
           {user?.role === 'ADMIN' && (
             <>
               <NavItem href="/dashboard" icon={Settings} label={t('nav.dashboard')} />
@@ -267,13 +278,13 @@ function MobileSidebar() {
               <span className="font-medium group-hover:text-[#D4AF37] transition-colors">{t('nav.logout')}</span>
             </button>
           ) : (
-            <button
-              onClick={() => setIsAuthModalOpen(true)}
+            <Link
+              href="/suscribirse"
               className="flex items-center gap-3 px-3 py-3 text-white hover:bg-white/10 rounded-lg transition-all duration-200 group w-full"
             >
               <LogIn className="h-5 w-5 text-gray-300 group-hover:text-[#D4AF37] transition-colors" />
-              <span className="font-medium group-hover:text-[#D4AF37] transition-colors">{t('nav.login')}</span>
-            </button>
+              <span className="font-medium group-hover:text-[#D4AF37] transition-colors">{t('nav.subscribe')}</span>
+            </Link>
           )}
         </div>
       </nav>

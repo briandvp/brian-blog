@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { notifySubscribersAboutNewPost } from '@/lib/mailerlite-notifications';
 
 // GET /api/posts - Obtener todos los posts
 export async function GET(request: NextRequest) {
@@ -178,6 +179,31 @@ export async function POST(request: NextRequest) {
     };
 
     console.log('Post created successfully:', transformedPost);
+
+    // Notificar a los suscriptores si el post se publicó
+    if (status === 'published') {
+      console.log('Post is published, notifying subscribers...');
+      // Ejecutar en segundo plano para no bloquear la respuesta
+      notifySubscribersAboutNewPost({
+        id: newPost.id,
+        title: newPost.title,
+        content: newPost.content,
+        excerpt: newPost.excerpt,
+        category: newPost.category,
+        author: {
+          name: newPost.author.name || undefined,
+          email: newPost.author.email || undefined
+        }
+      }).then(result => {
+        if (result.success) {
+          console.log('Subscribers notified successfully:', result.campaignId);
+        } else {
+          console.error('Error notifying subscribers:', result.error);
+        }
+      }).catch(error => {
+        console.error('Error in notification process:', error);
+      });
+    }
 
     return NextResponse.json({
       message: 'Post creado exitosamente',

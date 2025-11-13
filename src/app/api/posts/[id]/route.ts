@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { notifySubscribersAboutNewPost } from '@/lib/mailerlite-notifications';
 
 // GET /api/posts/[id] - Obtener un post específico por ID
 export async function GET(
@@ -88,7 +89,16 @@ export async function PUT(
 
     // Verificar que el post existe
     const existingPost = await prisma.post.findUnique({
-      where: { id: postId }
+      where: { id: postId },
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            email: true
+          }
+        }
+      }
     });
 
     if (!existingPost) {
@@ -97,6 +107,10 @@ export async function PUT(
         { status: 404 }
       );
     }
+
+    // Verificar si el post está siendo publicado (cambiando de draft a published)
+    const wasPublished = existingPost.published;
+    const willBePublished = status === 'published';
 
     // Actualizar el post en la base de datos
     const updatedPost = await prisma.post.update({
@@ -118,6 +132,31 @@ export async function PUT(
         }
       }
     });
+
+    // Notificar a los suscriptores si el post se está publicando por primera vez
+    if (!wasPublished && willBePublished) {
+      console.log('Post is being published for the first time, notifying subscribers...');
+      // Ejecutar en segundo plano para no bloquear la respuesta
+      notifySubscribersAboutNewPost({
+        id: updatedPost.id,
+        title: updatedPost.title,
+        content: updatedPost.content,
+        excerpt: updatedPost.excerpt || undefined,
+        category: updatedPost.category || undefined,
+        author: {
+          name: updatedPost.author.name || undefined,
+          email: updatedPost.author.email || undefined
+        }
+      }).then(result => {
+        if (result.success) {
+          console.log('Subscribers notified successfully:', result.campaignId);
+        } else {
+          console.error('Error notifying subscribers:', result.error);
+        }
+      }).catch(error => {
+        console.error('Error in notification process:', error);
+      });
+    }
 
     // Transformar para mantener compatibilidad con el frontend
     const transformedPost = {

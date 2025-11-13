@@ -5,7 +5,7 @@ export function ArticleContent() {
   return (
     <article className="prose max-w-none mx-auto">
       <section id="QUE_ES_LA_DICOTOMIA_DE_CONTROL" className="mb-8">
-        <h2 className="text-2xl font-bold mb-4">QUÉ ES LA DICOTOMÍA DE CONTROL</h2>
+        <h2 className="text-2xl font-bold mb-4">QUÉ ES LA DISOCIACION</h2>
         <p>
           <Link href="https://diarioestoico.com/las-disciplinas-de-epicteto/" className="text-gold hover:underline">Epicteto</Link> comienza <Link href="https://amzn.to/2VHNo3r" className="text-gold hover:underline">Manual de vida</Link> con este principio: algunas cosas están bajo nuestro control, y otras no.
         </p>
@@ -115,7 +115,7 @@ export function ArticleContent() {
           Cuando algo te ocurra pregúntate: y ahora, <strong>¿Qué es lo que está bajo mi control?</strong> Y actúa en consecuencia.
         </p>
         <p className="font-bold">
-          Empieza a aplicar <strong>LA DICOTOMÍA DE CONTROL</strong> en tu vida.
+          Empieza a aplicar <strong>los patrones de comportamiento</strong> en tu vida.
         </p>
         <p>
           Puedes encontrarme en <strong>Instagram</strong> en <Link href="https://www.instagram.com/brian_mep/" className="text-gold hover:underline">@brian_mep</Link> y en <strong>Ivoox</strong>, programa de podcast: <Link href="https://www.ivoox.com/podcast-brian-garrido_sq_f1843299_1.html" className="text-gold hover:underline">Enseñando Aprenderás.</Link>

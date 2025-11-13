@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ChevronRight, List, ArrowUp } from "lucide-react";
+import { SubscribeForm } from "@/components/subscribe-form";
 
 type TableOfContentsItem = {
   id: string;
@@ -11,7 +12,7 @@ type TableOfContentsItem = {
 };
 
 const tocItems: TableOfContentsItem[] = [
-  { id: "QUE_ES_LA_DICOTOMIA_DE_CONTROL", text: "Qué es la dicotomía de control", level: 1 },
+  { id: "QUE_ES_LA_DISOCIACION", text: "Qué es la disociación", level: 1 },
   { id: "TRICOTOMIA_DE_CONTROL", text: "Tricotomía de control", level: 1 },
   { id: "AHORRATE_DISGUSTOS_INUTILES", text: "Ahórrate disgustos inútiles", level: 1 },
   { id: "QUE_DEPENDE_DE_TI", text: "¿Qué depende de ti?", level: 1 },
@@ -101,7 +102,12 @@ export function ContentSidebar() {
             ))}
           </nav>
 
-          <div className="mt-4 pt-3 border-t border-gray-100">
+          <div className="mt-4 pt-3 border-t border-gray-100 space-y-3">
+            <div className="bg-[#42403e] rounded-lg p-4 text-white">
+              <h4 className="text-sm font-semibold mb-2">Suscríbete</h4>
+              <p className="text-xs opacity-90 mb-3">Recibe las últimas publicaciones</p>
+              <SubscribeForm variant="compact" />
+            </div>
             <button
               onClick={scrollToTop}
               className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-gray-50 hover:bg-gold hover:text-white rounded-lg transition-colors duration-200 text-sm text-gray-600"
@@ -149,7 +155,12 @@ export function ContentSidebar() {
               ))}
             </nav>
 
-            <div className="mt-4 pt-3 border-t border-gray-100">
+            <div className="mt-4 pt-3 border-t border-gray-100 space-y-3">
+              <div className="bg-[#42403e] rounded-lg p-4 text-white">
+                <h4 className="text-sm font-semibold mb-2">Suscríbete</h4>
+                <p className="text-xs opacity-90 mb-3">Recibe las últimas publicaciones</p>
+                <SubscribeForm variant="compact" />
+              </div>
               <button
                 onClick={scrollToTop}
                 className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-gray-50 hover:bg-gold hover:text-white rounded-lg transition-colors duration-200 text-sm text-gray-600"

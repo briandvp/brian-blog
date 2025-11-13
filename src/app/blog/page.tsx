@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/language-context";
+import { SubscribeForm } from "@/components/subscribe-form";
 import { 
   Calendar, 
   User, 
@@ -285,15 +286,9 @@ export default function BlogPage() {
             <p className="text-lg mb-6 opacity-90">
               {t('blog.cta.subtitle')}
             </p>
-            <Button
-              asChild
-              size="lg"
-              className="bg-white text-[#42403e] hover:bg-gray-100"
-            >
-              <Link href="/mi-cuenta">
-                {t('blog.cta.subscribe')}
-              </Link>
-            </Button>
+            <div className="max-w-md mx-auto">
+              <SubscribeForm variant="default" className="text-white" />
+            </div>
           </div>
         )}
       </div>

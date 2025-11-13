@@ -14,6 +14,7 @@ Este es mi blog personal donde comparto mis memorias de la vida y su eterno reto
 - Diseño responsive y moderno
 - Sistema de comentarios
 - Tienda integrada
+- Sistema de suscripciones integrado con MailerLite
 
 ## Tecnologías
 
@@ -36,10 +37,28 @@ npm install
 2. Configura las variables de entorno:
 
 ```bash
-cp .env.example .env
+cp .env.example .env.local
 ```
 
-Edita `.env` con tus credenciales de base de datos.
+Edita `.env.local` con tus credenciales de base de datos y configuración de MailerLite.
+
+### Configuración de MailerLite
+
+Para habilitar las suscripciones, necesitas configurar las siguientes variables en `.env.local`:
+
+```env
+MAILERLITE_API_TOKEN=tu_api_token_aqui
+MAILERLITE_GROUP_ID=tu_group_id_aqui  # Opcional
+```
+
+**Cómo obtener tu API Token:**
+1. Inicia sesión en tu cuenta de MailerLite
+2. Ve a **Integrations** → **API**
+3. Haz clic en **Generate new token**
+4. Asigna un nombre al token y acepta los términos
+5. Copia el token generado y agrégalo a tu `.env.local`
+
+Para más detalles, consulta `README_MAILERLITE.md`.
 
 3. Ejecuta las migraciones de Prisma:
 

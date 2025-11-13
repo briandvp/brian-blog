@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/cart-context";
 import { useAuth } from "@/contexts/auth-context";
 import { hasPermission, ADMIN_PERMISSIONS } from "@/lib/permissions";
+import { toast } from "sonner";
 import { 
   ShoppingCart, 
   Star, 
@@ -88,10 +90,27 @@ const categories = [
 
 export default function Tienda() {
   const { addItem } = useCart();
+  const { user } = useAuth();
+  const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("featured");
   const [wishlist, setWishlist] = useState<number[]>([]);
+
+  // Proteger la página de tienda - solo ADMIN y AUTHOR pueden acceder
+  useEffect(() => {
+    if (user) {
+      // Si el usuario es USER, redirigir
+      if (user.role === 'USER') {
+        toast.error('No tienes permisos para acceder a la tienda');
+        router.push('/');
+      }
+    } else {
+      // Si no está autenticado, también redirigir
+      toast.error('Debes iniciar sesión para acceder a la tienda');
+      router.push('/');
+    }
+  }, [user, router]);
 
   const filteredProducts = mockProducts.filter(product => {
     const matchesCategory = selectedCategory === "all" || product.category === selectedCategory;
