@@ -126,8 +126,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Crear el comentario
-    // Si es admin/author, aprobar automáticamente; si no, dejarlo pendiente
-    const commentStatus = isAdminOrAuthor ? 'APPROVED' : 'PENDING';
+    // Todos los comentarios se aprueban automáticamente para publicación directa
+    const commentStatus = 'APPROVED';
     
     const comment = await prisma.comment.create({
       data: {

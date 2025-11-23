@@ -174,9 +174,8 @@ export function ArticleComments({ postId }: ArticleCommentsProps) {
         const newComment = await response.json();
         console.log('New comment received:', newComment);
         
-        // Si es admin/author, el comentario se aprueba automáticamente
-        // Si es usuario normal, el comentario queda pendiente
-        if (isAdminOrAuthor && newComment.status === 'APPROVED') {
+        // Todos los comentarios se aprueban automáticamente y se publican directamente
+        if (newComment.status === 'APPROVED') {
           // Agregar el comentario aprobado inmediatamente a la lista
           const formattedComment: Comment = {
             id: newComment.id,
@@ -202,7 +201,6 @@ export function ArticleComments({ postId }: ArticleCommentsProps) {
             setComments(prev => [formattedComment, ...prev]);
           }
         }
-        // Si es usuario normal, no agregar (queda pendiente de aprobación)
 
         // Guardar datos si el usuario lo solicitó
         if (formData.saveInfo) {
@@ -225,11 +223,7 @@ export function ArticleComments({ postId }: ArticleCommentsProps) {
 
         setReplyingTo(null);
         
-        if (isAdminOrAuthor) {
-          toast.success('¡Comentario publicado!');
-        } else {
-          toast.success('¡Comentario enviado! Será revisado antes de publicarse.');
-        }
+        toast.success('¡Comentario publicado!');
       } else {
         console.log('Response not ok, status:', response.status);
         let errorMessage = 'Error al enviar el comentario';
@@ -429,7 +423,12 @@ export function ArticleComments({ postId }: ArticleCommentsProps) {
           {isAdminOrAuthor && (
             <div className="text-sm text-gray-600 bg-blue-50 border border-blue-200 rounded-md p-3">
               <p>Comentando como: <strong>{formData.author}</strong> ({formData.email})</p>
-              <p className="text-xs mt-1">Tu comentario se publicará inmediatamente sin necesidad de aprobación.</p>
+            </div>
+          )}
+          
+          {!isAdminOrAuthor && (
+            <div className="text-sm text-gray-600 bg-green-50 border border-green-200 rounded-md p-3">
+              <p className="text-xs">Tu comentario se publicará inmediatamente.</p>
             </div>
           )}
 
