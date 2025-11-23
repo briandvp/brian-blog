@@ -173,15 +173,15 @@ function DesktopNav() {
   return (
     <>
       {/* Contenido Principal - visible para todos */}
-      <NavLink href="/" label={t('nav.home')} />
-      <NavLink href="/blog" label={t('nav.blog')} />
-      <NavLink href="/tienda" label={t('nav.store')} />
+      <NavLink href="/" label="Inicio" />
+      <NavLink href="/blog" label="Blog" />
       
       {/* Contenido solo para administradores */}
       {isAdmin && (
         <>
-          <NavLink href="/dashboard" label={t('nav.dashboard')} />
-          <NavLink href="/dashboard/posts/new" label={t('nav.newPost')} />
+          <NavLink href="/tienda" label="Tienda" />
+          <NavLink href="/dashboard" label="Dashboard" />
+          <NavLink href="/dashboard/posts/new" label="Nueva Publicación" />
         </>
       )}
     </>
@@ -224,13 +224,13 @@ function MobileSidebar() {
       {/* Navigation */}
       <nav className="flex-1 py-6 px-4 space-y-2 overflow-y-auto" aria-label="Navegación móvil">
         <div className="space-y-1">
-          <NavItem href="/" icon={Home} label={t('nav.home')} />
-          <NavItem href="/blog" icon={BookOpen} label={t('nav.blog')} />
-          <NavItem href="/tienda" icon={ShoppingBag} label={t('nav.store')} />
+          <NavItem href="/" icon={Home} label="Inicio" />
+          <NavItem href="/blog" icon={BookOpen} label="Blog" />
           {user?.role === 'ADMIN' && (
             <>
-              <NavItem href="/dashboard" icon={Settings} label={t('nav.dashboard')} />
-              <NavItem href="/dashboard/posts/new" icon={Plus} label={t('nav.newPost')} />
+              <NavItem href="/tienda" icon={ShoppingBag} label="Tienda" />
+              <NavItem href="/dashboard" icon={Settings} label="Dashboard" />
+              <NavItem href="/dashboard/posts/new" icon={Plus} label="Nueva Publicación" />
             </>
           )}
         </div>
