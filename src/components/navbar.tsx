@@ -189,9 +189,8 @@ function DesktopNav() {
       {/* Contenido solo para administradores */}
       {isAdmin && (
         <>
-          <NavLink href="/tienda" label="Tienda" />
-          <NavLink href="/dashboard" label="Dashboard" />
-          <NavLink href="/dashboard/posts/new" label="Nueva Publicación" />
+          <NavLink href="/dashboard" label={t('nav.dashboard')} />
+          <NavLink href="/dashboard/posts/new" label={t('nav.newPost')} />
         </>
       )}
     </>
@@ -241,9 +240,8 @@ function MobileSidebar() {
           )}
           {user?.role === 'ADMIN' && (
             <>
-              <NavItem href="/tienda" icon={ShoppingBag} label="Tienda" />
-              <NavItem href="/dashboard" icon={Settings} label="Dashboard" />
-              <NavItem href="/dashboard/posts/new" icon={Plus} label="Nueva Publicación" />
+              <NavItem href="/dashboard" icon={Settings} label={t('nav.dashboard')} />
+              <NavItem href="/dashboard/posts/new" icon={Plus} label={t('nav.newPost')} />
             </>
           )}
         </div>
