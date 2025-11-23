@@ -188,8 +188,8 @@ export async function POST(request: NextRequest) {
         id: newPost.id,
         title: newPost.title,
         content: newPost.content,
-        excerpt: newPost.excerpt,
-        category: newPost.category,
+        excerpt: newPost.excerpt || undefined,
+        category: newPost.category || undefined,
         author: {
           name: newPost.author.name || undefined,
           email: newPost.author.email || undefined
