@@ -172,11 +172,11 @@ function DesktopNav() {
       {/* Contenido Principal - visible para todos */}
       <NavLink href="/" label="Inicio" />
       <NavLink href="/blog" label="Blog" />
-      <NavLink href="/tienda" label="Tienda" />
       
       {/* Contenido solo para administradores */}
       {isAdmin && (
         <>
+          <NavLink href="/tienda" label="Tienda" />
           <NavLink href="/dashboard" label="Dashboard" />
           <NavLink href="/dashboard/posts/new" label="Nueva Publicación" />
         </>
@@ -222,9 +222,9 @@ function MobileSidebar() {
         <div className="space-y-1">
           <NavItem href="/" icon={Home} label="Inicio" />
           <NavItem href="/blog" icon={BookOpen} label="Blog" />
-          <NavItem href="/tienda" icon={ShoppingBag} label="Tienda" />
           {user?.role === 'ADMIN' && (
             <>
+              <NavItem href="/tienda" icon={ShoppingBag} label="Tienda" />
               <NavItem href="/dashboard" icon={Settings} label="Dashboard" />
               <NavItem href="/dashboard/posts/new" icon={Plus} label="Nueva Publicación" />
             </>
