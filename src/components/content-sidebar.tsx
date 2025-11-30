@@ -12,9 +12,9 @@ type TableOfContentsItem = {
 
 const tocItems: TableOfContentsItem[] = [
   { id: "QUE_ES_LA_DISOCIACION", text: "Qué es la disociación", level: 1 },
-  { id: "TRICOTOMIA_DE_CONTROL", text: "Tricotomía de control", level: 1 },
+  { id: "ABUNDANCIA_Y_ESCASEZ", text: "Abundancia y escasez", level: 1 },
   { id: "AHORRATE_DISGUSTOS_INUTILES", text: "Ahórrate disgustos inútiles", level: 1 },
-  { id: "QUE_DEPENDE_DE_TI", text: "¿Qué depende de ti?", level: 1 },
+  { id: "QUE_NO_DEPENDE_DE_TI", text: "¿Qué no depende de ti?", level: 1 },
   { id: "LLEVALO_A_LA_PRACTICA", text: "Llévalo a la práctica", level: 1 },
   { id: "TOMA_RESPONSABILIDAD", text: "Toma responsabilidad", level: 1 },
 ];
