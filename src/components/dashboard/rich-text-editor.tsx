@@ -123,19 +123,6 @@ export function RichTextEditor({ content, onChange, placeholder = "Escribe aquí
             class: 'mb-4',
           },
         },
-        // Habilitar shortcuts de Markdown
-        bulletList: {
-          keepMarks: true,
-          keepAttributes: false,
-        },
-        orderedList: {
-          keepMarks: true,
-          keepAttributes: false,
-        },
-        listItem: {
-          keepMarks: true,
-          keepAttributes: false,
-        },
       }),
       CustomSection,
       MarkdownShortcuts,
