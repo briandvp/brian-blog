@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useLanguage } from "@/contexts/language-context";
-import { CalendarIcon, MessageSquare, User2 } from "lucide-react";
+import { CalendarIcon, MessageSquare, User2, BookOpen } from "lucide-react";
 
 export function ArticleHeader() {
   const { t } = useLanguage();
@@ -12,37 +12,34 @@ export function ArticleHeader() {
       <div className="relative mb-10">
         <div className="absolute inset-0 bg-gradient-to-b from-[#42403e]/50 to-transparent opacity-30 rounded-xl"></div>
         <h1 className="text-4xl md:text-5xl font-bold text-center mb-6 relative z-10">
-          <span className="inline-block py-2 px-4 border-b-4 border-gold">LOS PATRONES DE COMPORTAMIENTO</span>
+          <span className="inline-block py-2 px-4 border-b-4 border-gold">LOS PATRONES DEL COMPORTAMIENTO</span>
         </h1>
-        <div className="flex flex-wrap items-center justify-center gap-3 mb-8 text-sm relative z-10">
+        <div className="flex flex-wrap items-center justify-center gap-4 mb-8 text-sm relative z-10">
           <Link
             href="/categoria/principios-estoicos"
-            className="bg-[#42403e] text-white px-3 py-1.5 rounded-full hover:bg-gold transition-colors duration-300 flex items-center"
+            className="group bg-gradient-to-r from-[#42403e] to-[#36312f] text-white px-4 py-2 rounded-full hover:from-gold hover:to-amber-600 transition-all duration-300 flex items-center gap-2 shadow-md hover:shadow-lg hover:scale-105"
           >
-            {t('article.principles')} 
+            <BookOpen className="h-4 w-4 group-hover:rotate-12 transition-transform" />
+            <span className="font-medium">{t('article.principles')}</span>
           </Link>
-          <div className="flex items-center text-gray-600 gap-1.5">
-            <CalendarIcon className="h-4 w-4" />
-            <span>16 abril 2020</span>
+          <div className="flex items-center text-gray-600 gap-2 px-3 py-2 rounded-full bg-gray-50 hover:bg-gray-100 transition-colors">
+            <CalendarIcon className="h-4 w-4 text-gold" />
+            <span className="font-medium">16 abril 2020</span>
           </div>
-          <div className="flex items-center text-gray-600 gap-1.5">
-            <User2 className="h-4 w-4" />
-            <Link
-              href="/author/brian-gamarra"
-              className="hover:text-gold"
-            >
-              Brian Gamarra
-            </Link>
-          </div>
-          <div className="flex items-center text-gray-600 gap-1.5">
-            <MessageSquare className="h-4 w-4" />
-            <Link
-              href="#comments"
-              className="hover:text-gold"
-            >
-              10 {t('article.commentsLabel')}
-            </Link>
-          </div>
+          <Link
+            href="/author/brian-gamarra"
+            className="flex items-center text-gray-600 gap-2 px-3 py-2 rounded-full bg-gray-50 hover:bg-gray-100 hover:text-gold transition-all group"
+          >
+            <User2 className="h-4 w-4 text-gold group-hover:scale-110 transition-transform" />
+            <span className="font-medium">Brian Gamarra</span>
+          </Link>
+          <Link
+            href="#comments"
+            className="flex items-center text-gray-600 gap-2 px-3 py-2 rounded-full bg-gray-50 hover:bg-gray-100 hover:text-gold transition-all group"
+          >
+            <MessageSquare className="h-4 w-4 text-gold group-hover:scale-110 transition-transform" />
+            <span className="font-medium">10 {t('article.commentsLabel')}</span>
+          </Link>
         </div>
       </div>
 
@@ -73,9 +70,9 @@ export function ArticleHeader() {
         <ul className="space-y-3">
           {[
             { id: "QUE_ES_LA_DICOTOMIA_DE_CONTROL", text: "QUE ES LA DISOCIACION" },
-            { id: "TRICOTOMIA_DE_CONTROL", text: "TRICOTOMÍA DE CONTROL" },
+            { id: "ABUNDANCIA_Y_ESCASEZ", text: "ABUNDANCIA Y ESCASEZ" },
             { id: "AHORRATE_DISGUSTOS_INUTILES", text: "AHÓRRATE DISGUSTOS INÚTILES" },
-            { id: "QUE_DEPENDE_DE_TI", text: "¿QUÉ DEPENDE DE TI?" },
+            { id: "QUE_NO_DEPENDE_DE_TI", text: "¿QUÉ NO DEPENDE DE TI?" },
             { id: "LLEVALO_A_LA_PRACTICA", text: "LLÉVALO A LA PRÁCTICA" },
             { id: "TOMA_RESPONSABILIDAD", text: "TOMA RESPONSABILIDAD" }
           ].map((item, index) => (
