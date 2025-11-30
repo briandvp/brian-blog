@@ -9,8 +9,11 @@ export async function GET(
 ) {
   try {
     const { id: postId } = await params;
+    const { searchParams } = new URL(request.url);
+    const lang = searchParams.get('lang') || 'es'; // Idioma por defecto: español
+    const incrementViews = searchParams.get('incrementViews') !== 'false'; // Por defecto true
     
-    console.log('Fetching post with ID:', postId);
+    console.log('Fetching post with ID:', postId, 'Language:', lang, 'Increment views:', incrementViews);
 
     // Buscar el post por ID en la base de datos
     const post = await prisma.post.findUnique({
@@ -34,21 +37,30 @@ export async function GET(
       );
     }
 
-    // Incrementar las vistas
-    await prisma.post.update({
-      where: { id: postId },
-      data: { views: { increment: 1 } }
-    });
+    // Incrementar las vistas solo si se solicita
+    if (incrementViews) {
+      await prisma.post.update({
+        where: { id: postId },
+        data: { views: { increment: 1 } }
+      });
+    }
+
+    // Seleccionar contenido según el idioma
+    const useEnglish = lang === 'en';
+    const title = useEnglish && post.titleEn ? post.titleEn : post.title;
+    const content = useEnglish && post.contentEn ? post.contentEn : post.content;
+    const excerpt = useEnglish && post.excerptEn ? post.excerptEn : (post.excerpt || post.content.substring(0, 150) + '...');
+    const category = useEnglish && post.categoryEn ? post.categoryEn : post.category;
 
     // Transformar para mantener compatibilidad con el frontend
     const transformedPost = {
       id: post.id,
-      title: post.title,
-      content: post.content,
-      excerpt: post.excerpt || post.content.substring(0, 150) + '...',
-      category: post.category,
+      title,
+      content,
+      excerpt,
+      category,
       status: post.published ? 'published' : 'draft',
-      views: post.views + 1, // Incluir la vista incrementada
+      views: incrementViews ? post.views + 1 : post.views, // Incluir la vista incrementada solo si se incrementó
       comments: post.comments,
       author: {
         id: post.author.id,
@@ -112,6 +124,9 @@ export async function PUT(
     const wasPublished = existingPost.published;
     const willBePublished = status === 'published';
 
+    // Extraer campos en inglés si vienen en el body
+    const { titleEn, contentEn, excerptEn, categoryEn } = body;
+
     // Actualizar el post en la base de datos
     const updatedPost = await prisma.post.update({
       where: { id: postId },
@@ -120,6 +135,10 @@ export async function PUT(
         ...(content && { content }),
         ...(excerpt && { excerpt }),
         ...(category && { category }),
+        ...(titleEn !== undefined && { titleEn }),
+        ...(contentEn !== undefined && { contentEn }),
+        ...(excerptEn !== undefined && { excerptEn }),
+        ...(categoryEn !== undefined && { categoryEn }),
         ...(status && { published: status === 'published' })
       },
       include: {

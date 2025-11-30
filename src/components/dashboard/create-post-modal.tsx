@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { X, Save, Eye } from "lucide-react";
+import { RichTextEditor } from "./rich-text-editor";
 
 interface CreatePostModalProps {
   onClose: () => void;
@@ -36,10 +37,13 @@ export function CreatePostModal({ onClose, onSubmit }: CreatePostModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+    <div 
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[95vh] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0">
           <h2 className="text-xl font-semibold text-gray-900">Nueva publicación</h2>
           <Button
             variant="ghost"
@@ -51,7 +55,7 @@ export function CreatePostModal({ onClose, onSubmit }: CreatePostModalProps) {
           </Button>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col h-full">
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
             {/* Title */}
             <div>
@@ -123,22 +127,19 @@ export function CreatePostModal({ onClose, onSubmit }: CreatePostModalProps) {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Contenido *
               </label>
-              <textarea
-                value={formData.content}
-                onChange={(e) => handleChange("content", e.target.value)}
-                rows={12}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#42403e] focus:border-transparent font-mono text-sm"
-                placeholder="Escribe el contenido completo de tu publicación..."
-                required
+              <RichTextEditor
+                content={formData.content}
+                onChange={(content) => handleChange("content", content)}
+                placeholder="Escribe el contenido completo de tu publicación... Usa * para listas, # para títulos, > para citas"
               />
-              <p className="text-xs text-gray-500 mt-1">
-                Puedes usar Markdown para formatear el texto
+              <p className="text-xs text-gray-500 mt-2">
+                Usa las herramientas de la barra superior o los atajos rápidos para formatear el texto. El contenido se guardará automáticamente.
               </p>
             </div>
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between p-6 border-t border-gray-200 bg-gray-50">
+          <div className="flex items-center justify-between p-6 border-t border-gray-200 bg-gray-50 flex-shrink-0">
             <div className="flex items-center space-x-2">
               <Button
                 type="button"

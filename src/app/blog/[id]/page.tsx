@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/language-context';
@@ -33,18 +33,53 @@ export default function PostPage() {
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const hasIncrementedViewsRef = useRef(false);
+  const isInitialLoadRef = useRef(true);
 
+  // Función para verificar si ya se incrementaron las vistas en esta sesión
+  const hasViewedInSession = () => {
+    if (typeof window === 'undefined') return false;
+    const viewedPosts = JSON.parse(sessionStorage.getItem('viewedPosts') || '[]');
+    return viewedPosts.includes(postId);
+  };
+
+  // Función para marcar el post como visto en esta sesión
+  const markAsViewed = () => {
+    if (typeof window === 'undefined') return;
+    const viewedPosts = JSON.parse(sessionStorage.getItem('viewedPosts') || '[]');
+    if (!viewedPosts.includes(postId)) {
+      viewedPosts.push(postId);
+      sessionStorage.setItem('viewedPosts', JSON.stringify(viewedPosts));
+    }
+  };
+
+  // Efecto para cargar el post inicialmente (solo una vez)
   useEffect(() => {
+    if (!postId) return;
+
     const fetchPost = async () => {
       try {
-        console.log('Fetching post with ID:', postId);
-        const response = await fetch(`/api/posts/${postId}`);
+        setLoading(true);
+        
+        // Solo incrementar vistas si es la primera carga y no se ha visto en esta sesión
+        const shouldIncrement = isInitialLoadRef.current && !hasViewedInSession();
+        
+        console.log('Fetching post with ID:', postId, 'Language:', language, 'Increment views:', shouldIncrement);
+        
+        const response = await fetch(`/api/posts/${postId}?lang=${language}&incrementViews=${shouldIncrement}`);
         console.log('Response status:', response.status);
         
         if (response.ok) {
           const data = await response.json();
           console.log('Post data received:', data);
           setPost(data.post);
+          
+          if (shouldIncrement) {
+            hasIncrementedViewsRef.current = true;
+            markAsViewed();
+          }
+          
+          isInitialLoadRef.current = false;
         } else {
           const errorData = await response.json();
           console.error('Error al cargar post:', errorData);
@@ -58,10 +93,31 @@ export default function PostPage() {
       }
     };
 
-    if (postId) {
-      fetchPost();
-    }
-  }, [postId]);
+    fetchPost();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [postId]); // Solo ejecutar cuando cambia el postId
+
+  // Efecto separado para recargar contenido cuando cambia el idioma (sin incrementar vistas)
+  useEffect(() => {
+    if (!postId || isInitialLoadRef.current) return;
+
+    const fetchPostContent = async () => {
+      try {
+        console.log('Reloading post content for language:', language);
+        const response = await fetch(`/api/posts/${postId}?lang=${language}&incrementViews=false`);
+        
+        if (response.ok) {
+          const data = await response.json();
+          setPost(data.post);
+        }
+      } catch (error) {
+        console.error('Error reloading post content:', error);
+      }
+    };
+
+    fetchPostContent();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [language]); // Solo ejecutar cuando cambia el idioma
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -182,9 +238,10 @@ export default function PostPage() {
             {/* Contenido del post */}
             <div className="p-8">
               <div className="prose prose-lg max-w-none">
-                <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                  {post.content}
-                </div>
+                <div 
+                  className="article-content text-gray-700 leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: post.content }}
+                />
               </div>
             </div>
 

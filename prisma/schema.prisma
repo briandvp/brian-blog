@@ -32,6 +32,11 @@ model Post {
   content      String
   excerpt      String?
   category     String    @default("General")
+  // Campos en inglés (opcionales)
+  titleEn      String?
+  contentEn    String?
+  excerptEn    String?
+  categoryEn   String?
   published    Boolean   @default(false)
   views        Int       @default(0)
   comments     Int       @default(0)

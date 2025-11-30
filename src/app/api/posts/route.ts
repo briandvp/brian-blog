@@ -117,7 +117,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { title, content, excerpt, category, status = 'draft' } = body;
+    const { title, content, excerpt, category, status = 'draft', titleEn, contentEn, excerptEn, categoryEn } = body;
 
     console.log('Creating new post:', { title, status, category });
 
@@ -145,6 +145,10 @@ export async function POST(request: NextRequest) {
         content,
         excerpt: excerpt || content.substring(0, 150) + '...',
         category: category || 'General',
+        titleEn: titleEn || null,
+        contentEn: contentEn || null,
+        excerptEn: excerptEn || null,
+        categoryEn: categoryEn || null,
         published: status === 'published',
         authorId: author.id
       },
