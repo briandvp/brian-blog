@@ -5,7 +5,7 @@ export function ArticleContent() {
   return (
     <article className="prose max-w-none mx-auto">
       <section id="QUE_ES_LA_DICOTOMIA_DE_CONTROL" className="mb-8">
-        <h2 className="text-2xl font-bold mb-4">QUÉ ES LA DISOCIACION</h2>
+        <h2 className="text-2xl font-bold mb-4">QUÉ ES LA DICOTOMIA DE CONTROL</h2>
         <p>
           <Link href="https://diarioestoico.com/las-disciplinas-de-epicteto/" className="text-gold hover:underline">Epicteto</Link> comienza <Link href="https://amzn.to/2VHNo3r" className="text-gold hover:underline">Manual de vida</Link> con este principio: algunas cosas están bajo nuestro control, y otras no.
         </p>

@@ -69,7 +69,7 @@ export function ArticleHeader() {
         </h2>
         <ul className="space-y-3">
           {[
-            { id: "QUE_ES_LA_DICOTOMIA_DE_CONTROL", text: "QUE ES LA DISOCIACION" },
+            { id: "LOS_PATRONES_DEL_COMPORTAMIENTO", text: "LOS PATRONES DEL COMPORTAMIENTO" },
             { id: "ABUNDANCIA_Y_ESCASEZ", text: "ABUNDANCIA Y ESCASEZ" },
             { id: "AHORRATE_DISGUSTOS_INUTILES", text: "AHÓRRATE DISGUSTOS INÚTILES" },
             { id: "QUE_NO_DEPENDE_DE_TI", text: "¿QUÉ NO DEPENDE DE TI?" },

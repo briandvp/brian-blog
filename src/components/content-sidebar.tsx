@@ -11,7 +11,7 @@ type TableOfContentsItem = {
 };
 
 const tocItems: TableOfContentsItem[] = [
-  { id: "QUE_ES_LA_DISOCIACION", text: "Qué es la disociación", level: 1 },
+  { id: "QUE_ES_LA_DICOTOMIA_DE_CONTROL", text: "Qué es la dicotomía de control", level: 1 },
   { id: "ABUNDANCIA_Y_ESCASEZ", text: "Abundancia y escasez", level: 1 },
   { id: "AHORRATE_DISGUSTOS_INUTILES", text: "Ahórrate disgustos inútiles", level: 1 },
   { id: "QUE_NO_DEPENDE_DE_TI", text: "¿Qué no depende de ti?", level: 1 },
