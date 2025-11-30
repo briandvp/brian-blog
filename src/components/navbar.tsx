@@ -4,9 +4,8 @@ import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Home, BookOpen, ShoppingBag, User, Settings, ShoppingCart, LogIn, LogOut, Plus } from "lucide-react";
+import { Menu, Home, BookOpen, ShoppingBag, User, Settings, LogIn, LogOut, Plus } from "lucide-react";
 import Image from "next/image";
-import { useCart } from "@/contexts/cart-context";
 import { useAuth } from "@/contexts/auth-context";
 import { useLanguage } from "@/contexts/language-context";
 import { AuthModal } from "@/components/auth/auth-modal";
@@ -18,7 +17,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export function Navbar() {
-  const { state } = useCart();
   const { user, logout } = useAuth();
   const { t } = useLanguage();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -54,18 +52,8 @@ export function Navbar() {
             <DesktopNav />
           </nav>
 
-          {/* Carrito y acciones - Desktop */}
+          {/* Acciones - Desktop */}
           <div className="hidden lg:flex items-center space-x-4">
-            {/* Carrito con indicador */}
-            <Link href="/carrito" className="relative p-2 text-white hover:text-gray-300 transition-colors">
-              <ShoppingCart className="h-6 w-6" />
-              {state.itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
-                  {state.itemCount}
-                </span>
-              )}
-            </Link>
-            
             {/* Autenticación - Desktop */}
             {user ? (
               <DropdownMenu>
@@ -124,18 +112,8 @@ export function Navbar() {
             </p>
           </div>
 
-          {/* Carrito y hamburguesa - solo móvil, lado derecho */}
+          {/* Hamburguesa - solo móvil, lado derecho */}
           <div className="flex lg:hidden items-center space-x-2">
-            {/* Carrito con indicador - móvil */}
-            <Link href="/carrito" className="relative p-2 text-white hover:text-gray-300 transition-colors">
-              <ShoppingCart className="h-6 w-6" />
-              {state.itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
-                  {state.itemCount}
-                </span>
-              )}
-            </Link>
-
             {/* Menú hamburguesa - solo móvil */}
             <Sheet>
               <SheetTrigger asChild>
@@ -347,21 +325,3 @@ function SubNavItem({ href, label }: { href: string; label: string }) {
   );
 }
 
-function CartNavItem({ href, icon: Icon, label }: { href: string; icon: React.ElementType; label: string }) {
-  const { state } = useCart();
-  
-  return (
-    <Link
-      href="/carrito"
-      className="flex items-center gap-3 px-3 py-3 text-white hover:bg-white/10 rounded-lg transition-all duration-200 group relative"
-    >
-      <Icon className="h-5 w-5 text-gray-300 group-hover:text-[#D4AF37] transition-colors" />
-      <span className="font-medium group-hover:text-[#D4AF37] transition-colors">{label}</span>
-      {state.itemCount > 0 && (
-        <span className="ml-auto bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
-          {state.itemCount}
-        </span>
-      )}
-    </Link>
-  );
-}
