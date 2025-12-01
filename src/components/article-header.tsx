@@ -11,8 +11,8 @@ export function ArticleHeader() {
     <div className="mb-12">
       <div className="relative mb-10">
         <div className="absolute inset-0 bg-gradient-to-b from-[#42403e]/50 to-transparent opacity-30 rounded-xl"></div>
-        <h1 className="text-4xl md:text-5xl font-bold text-center mb-6 relative z-10">
-          <span className="inline-block py-2 px-4 border-b-4 border-gold">LOS PATRONES DEL COMPORTAMIENTO</span>
+        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-6 relative z-10 px-4">
+          <span className="inline-block py-2 px-2 sm:px-4 border-b-4 border-gold break-words hyphens-auto">LOS PATRONES DEL COMPORTAMIENTO</span>
         </h1>
         <div className="flex flex-wrap items-center justify-center gap-4 mb-8 text-sm relative z-10">
           <Link

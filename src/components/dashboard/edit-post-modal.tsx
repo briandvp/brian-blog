@@ -59,7 +59,6 @@ export function EditPostModal({ post, onClose, onSubmit }: EditPostModalProps) {
   return (
     <div 
       className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-      onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[95vh] flex flex-col overflow-hidden">
         {/* Header */}
@@ -197,18 +196,7 @@ export function EditPostModal({ post, onClose, onSubmit }: EditPostModalProps) {
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between p-6 border-t border-gray-200 bg-gray-50 flex-shrink-0">
-            <div className="flex items-center space-x-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onClose}
-                className="text-gray-600"
-              >
-                Cancelar
-              </Button>
-            </div>
-            
+          <div className="flex items-center justify-end p-6 border-t border-gray-200 bg-gray-50 flex-shrink-0">
             <div className="flex items-center space-x-2">
               <Button
                 type="button"
