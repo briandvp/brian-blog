@@ -45,7 +45,7 @@ export function ArticleHeader() {
 
       <div className="prose max-w-none mb-10 bg-gray-50 p-6 rounded-xl shadow-sm border border-gray-100">
         <p className="font-medium text-lg text-center">
-          <strong className="text-gold"> Los patrones de comportamiento en marcan, su aplicación no es tan fácil, y la falta de ésta es lo que ocasiona muchas veces, un sufrimiento humano innecesario. </strong> 
+          <strong className="text-gold"> Los patrones de comportamiento enmarcan nuestra forma de vivir, y aunque su aplicación no es tan fácil, la falta de ésta es lo que ocasiona muchas veces un sufrimiento humano innecesario. </strong> 
         </p>
       </div>
 

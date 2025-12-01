@@ -4,10 +4,13 @@ import Link from "next/link";
 export function ArticleContent() {
   return (
     <article className="prose max-w-none mx-auto">
-      <section id="QUE_ES_LA_DICOTOMIA_DE_CONTROL" className="mb-8">
-        <h2 className="text-2xl font-bold mb-4">QUÉ ES LA DICOTOMIA DE CONTROL</h2>
+      <section id="LOS_PATRONES_DEL_COMPORTAMIENTO" className="mb-8">
+        <h2 className="text-2xl font-bold mb-4">LOS PATRONES DEL COMPORTAMIENTO</h2>
         <p>
-          <Link href="https://diarioestoico.com/las-disciplinas-de-epicteto/" className="text-gold hover:underline">Epicteto</Link> comienza <Link href="https://amzn.to/2VHNo3r" className="text-gold hover:underline">Manual de vida</Link> con este principio: algunas cosas están bajo nuestro control, y otras no.
+          A lo largo de nuestra vida, desarrollamos <strong>patrones de comportamiento</strong> que determinan cómo respondemos ante las diferentes situaciones que enfrentamos. Estos patrones, aunque muchas veces los adoptamos de forma inconsciente, <strong>enmarcan nuestra forma de vivir</strong> y definen la calidad de nuestras experiencias.
+        </p>
+        <p>
+          El filósofo <strong>Epicteto</strong> nos enseñó en su <strong>Manual de vida</strong> que debemos distinguir entre lo que está bajo nuestro control y lo que no. Esta distinción fundamental es la base para desarrollar <strong>patrones de comportamiento saludables</strong> que nos permitan vivir con mayor serenidad y efectividad.
         </p>
         <blockquote className="border-l-4 border-gold pl-4 italic my-6">
           <p>De nosotros dependen el juicio, el impulso, el deseo, el rechazo, y en una palabra, cuanto es asunto nuestro. Y no dependen de nosotros el cuerpo, la hacienda, la reputación, los cargos y en una palabra, cuanto no es asunto nuestro.</p>
@@ -50,8 +53,10 @@ export function ArticleContent() {
       <section id="AHORRATE_DISGUSTOS_INUTILES" className="mb-8">
         <h2 className="text-2xl font-bold mb-4">AHÓRRATE DISGUSTOS INÚTILES</h2>
         <p>
-          <strong>Aprende a diferenciar lo que está en tu mano</strong> de lo que no de manera rápida y eficaz, no pierdas tiempo en maldecir acontecimientos fuera de ti. <strong>Tus valores y principios</strong> por los que te riges, como la honestidad, la confianza, el compromiso, la disciplina y la pro-actividad, forman parte de las acciones que <strong>están bajo tu control.</strong> Si en el trayecto al trabajo te encuentras en una retención de coches, tocar el claxon y estresarte no hará que el tráfico vaya más fluido, pero sí te traerá un mal humor que te acompañará durante el resto de la mañana y te condicionará el rendimiento en tu trabajo.<br />
-          Si en lugar de eso te <strong>centras</strong> en permanecer tranquilo, aprovechas para escuchar un podcast, música u organizar tu día cuando salgas de trabajar, te ahorrarás un gasto de energía inútil.
+          <strong>Aprende a diferenciar lo que está en tu mano</strong> de lo que no de manera rápida y eficaz. No pierdas tiempo en maldecir acontecimientos fuera de tu control. <strong>Tus valores y principios</strong> por los que te riges, como la honestidad, la confianza, el compromiso, la disciplina y la proactividad, forman parte de las acciones que <strong>están bajo tu control.</strong>
+        </p>
+        <p>
+          Imagina que en el trayecto al trabajo te encuentras en una retención de tráfico. Tocar el claxon y estresarte no hará que el tráfico vaya más fluido, pero sí te traerá un mal humor que te acompañará durante el resto de la mañana y te condicionará el rendimiento en tu trabajo. Si en lugar de eso te <strong>centras</strong> en permanecer tranquilo, aprovechas para escuchar música, un podcast o simplemente organizar mentalmente tu día, te ahorrarás un gasto de energía inútil y llegarás a tu destino en un estado mental mucho más productivo.
         </p>
         <blockquote className="border-l-4 border-gold pl-4 italic my-6">
           <p>La vida es un negocio que no cubre los gastos. El sufrimiento es la regla, no la excepción. Pero podemos elegir cómo respondemos a ese sufrimiento.</p>
@@ -71,7 +76,7 @@ export function ArticleContent() {
       <section id="QUE_NO_DEPENDE_DE_TI" className="mb-8">
         <h2 className="text-2xl font-bold mb-4">¿QUÉ NO DEPENDE DE TI?</h2>
         <p>
-          <strong>No depende de ti el resultado, aunque sí cómo juegas</strong>. En una competición, no está en tu mano que el contrincante tenga mejores habilidades, ni que el clima sea favorable, ni que el jurado valore tu esfuerzo. Si hay una tormenta, por mucho que te quejes sobre el tiempo, no cambiará. <strong>Tendemos a lamentarnos de las actuaciones del pasado pero de nada sirve.</strong> Si a causa de una caída nos lesionamos, eso ya pasó. No podemos cambiar lo que ocurrió, solo aprender de esa experiencia y obrar bien en el momento presente.
+          <strong>No depende de ti el resultado, aunque sí cómo juegas</strong>. En una competición, no está en tu mano que el contrincante tenga mejores habilidades, ni que el clima sea favorable, ni que el jurado valore tu esfuerzo. Si hay una tormenta, por mucho que te quejes sobre el tiempo, no cambiará. <strong>Tendemos a lamentarnos de las actuaciones del pasado, pero de nada sirve.</strong> Si a causa de una caída nos lesionamos, eso ya pasó. No podemos cambiar lo que ocurrió, solo aprender de esa experiencia y obrar bien en el momento presente.
         </p>
         <p>
           <strong>No depende de ti la opinión de los demás</strong>. Por más que intentes agradar, controlar o influir en lo que otros piensan de ti, sus pensamientos y juicios están completamente fuera de tu control. <strong>No depende de ti las circunstancias externas</strong>: el tráfico, el clima, la economía, las decisiones de otros, los imprevistos. Todas estas cosas escapan de tu esfera de influencia.
@@ -84,10 +89,10 @@ export function ArticleContent() {
           <footer className="font-bold">Arthur Schopenhauer.</footer>
         </blockquote>
         <p>
-          Esta <strong>herramienta</strong> es un principio fundamental para ser un <Link href="https://elrincondeaquiles.com/estoicismo/" className="text-gold hover:underline">gran estoico</Link> y empezar a ser consciente de uno mismo.
+          Esta <strong>herramienta</strong> es un principio fundamental del <strong>estoicismo</strong> que te permite empezar a ser verdaderamente consciente de ti mismo y de tu poder real.
         </p>
         <p>
-          <strong>El <Link href="https://elrincondeaquiles.com/estoicismo" className="text-gold hover:underline">estoicismo</Link> quiere que te diferencies</strong>. Si te centras en lo que no depende de ti generarás frustración y ansiedad, malgastando energía y esfuerzos en una batalla que antes de comenzar, ya está perdida.
+          <strong>El estoicismo busca que te diferencies</strong> y que desarrolles tu propio criterio. Si te centras en lo que no depende de ti, generarás frustración y ansiedad, malgastando energía y esfuerzos en una batalla que, antes de comenzar, ya está perdida.
         </p>
         <p>
           <strong>Reconocer lo que no depende de ti te libera</strong>. Te permite soltar la necesidad de controlar lo incontrolable y enfocar toda tu energía en aquello sobre lo que sí tienes poder: tus pensamientos, tus acciones, tus valores y tu respuesta al presente.
@@ -121,35 +126,36 @@ export function ArticleContent() {
           HAZTE EL MÁXIMO RESPONSABLE DE TUS ACCIONES Y NUNCA MÁS TENDRÁS QUE BUSCAR CULPABLES.
         </p>
         <p>
-          Por último, debemos <strong>ser conscientes de que cada problema o circunstancia no es cierto que tenga una solución,</strong> debemos darnos margen si no resolvemos un problema. Siempre que hayamos hecho todo lo que está en nuestra mano, debemos permanecer tranquilos, pues el resto escapa de nuestro control.
+          Por último, debemos <strong>ser conscientes de que no todos los problemas tienen solución</strong>, y debemos darnos margen si no logramos resolver algo. Siempre que hayamos hecho todo lo que está en nuestra mano, debemos permanecer tranquilos, pues el resto escapa de nuestro control.
         </p>
         <p>
-          Cuando algo te ocurra pregúntate: y ahora, <strong>¿Qué es lo que NO está bajo mi control?</strong> Identifica todo aquello que escapa de tu poder y acéptalo. Luego, enfócate en lo que sí puedes controlar: tu respuesta, tu actitud y tus acciones. Actúa en consecuencia.
+          Cuando algo te ocurra, pregúntate: <strong>¿Qué es lo que NO está bajo mi control?</strong> Identifica todo aquello que escapa de tu poder y acéptalo. Luego, enfócate en lo que sí puedes controlar: tu respuesta, tu actitud y tus acciones. Actúa en consecuencia y verás cómo los patrones de comportamiento que desarrolles te llevarán a una vida más serena y efectiva.
         </p>
         <p className="font-bold">
           Empieza a aplicar <strong>los patrones del comportamiento</strong> en tu vida.
         </p>
-        <p>
-          Puedes encontrarme en <strong>Instagram</strong> en <Link href="https://www.instagram.com/brian_mep/" className="text-gold hover:underline">@brian_mep</Link> y en <strong>Ivoox</strong>, programa de podcast: <Link href="https://www.ivoox.com/podcast-brian-garrido_sq_f1843299_1.html" className="text-gold hover:underline">Enseñando Aprenderás.</Link>
-        </p>
         <div className="flex space-x-4 mt-8">
           <Link
-            href="#"
-            className="bg-[#1DA1F2] text-white px-4 py-2 rounded-md hover:bg-opacity-90"
+            href="https://www.instagram.com/brian_mep/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-md hover:from-purple-600 hover:to-pink-600 transition-all flex items-center gap-2"
           >
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+            Instagram
+          </Link>
+          <Link
+            href="https://x.com/ian_dvp"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-[#1DA1F2] text-white px-4 py-2 rounded-md hover:bg-[#1a8cd8] transition-all flex items-center gap-2"
+          >
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
             Twitter
-          </Link>
-          <Link
-            href="#"
-            className="bg-[#3b5998] text-white px-4 py-2 rounded-md hover:bg-opacity-90"
-          >
-            Facebook
-          </Link>
-          <Link
-            href="#"
-            className="bg-[#25D366] text-white px-4 py-2 rounded-md hover:bg-opacity-90"
-          >
-            WhatsApp
           </Link>
         </div>
       </section>
