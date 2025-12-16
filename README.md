@@ -14,7 +14,7 @@ Este es mi blog personal donde comparto mis memorias de la vida y su eterno reto
 - Diseño responsive y moderno
 - Sistema de comentarios
 - Tienda integrada
-- Sistema de suscripciones integrado con MailerLite
+- Sistema de suscripciones con notificaciones por email vía SMTP/Brevo
 
 ## Tecnologías
 
@@ -40,25 +40,44 @@ npm install
 cp .env.example .env.local
 ```
 
-Edita `.env.local` con tus credenciales de base de datos y configuración de MailerLite.
+Edita `.env.local` con tus credenciales de base de datos y configuración de SMTP.
 
-### Configuración de MailerLite
+### Configuración de SMTP/Brevo
 
-Para habilitar las suscripciones, necesitas configurar las siguientes variables en `.env.local`:
+Para habilitar las notificaciones por email, necesitas configurar las siguientes variables en `.env.local`:
 
 ```env
-MAILERLITE_API_TOKEN=tu_api_token_aqui
-MAILERLITE_GROUP_ID=tu_group_id_aqui  # Opcional
+# Email Configuration (SMTP/Brevo)
+SMTP_HOST=smtp-relay.brevo.com
+SMTP_PORT=587
+SMTP_USERNAME=tu_usuario_smtp@smtp-brevo.com
+SMTP_PASSWORD=tu_contraseña_smtp
+SMTP_FROM=noreply@email.brianmep.com
+SMTP_AUTH=true
+SMTP_STARTTLS_ENABLE=true
+SMTP_STARTTLS_REQUIRED=true
+SMTP_SSL_TRUST=smtp-relay.brevo.com
+
+# Brevo API (Opcional - para sincronizar suscriptores con Brevo)
+BREVO_API_KEY=tu_api_key_de_brevo
+BREVO_LIST_ID=id_de_lista  # Opcional: ID de lista específica donde agregar contactos
 ```
 
-**Cómo obtener tu API Token:**
-1. Inicia sesión en tu cuenta de MailerLite
-2. Ve a **Integrations** → **API**
-3. Haz clic en **Generate new token**
-4. Asigna un nombre al token y acepta los términos
-5. Copia el token generado y agrégalo a tu `.env.local`
+**Cómo obtener tus credenciales SMTP de Brevo:**
+1. Inicia sesión en tu cuenta de Brevo
+2. Ve a **SMTP & API** → **SMTP**
+3. Copia el **SMTP Server**, **Port**, **Login** y **Password**
+4. El **Login** es el username SMTP (formato: `xxxxx@smtp-brevo.com`), NO tu email de cuenta
+5. El email en `SMTP_FROM` debe ser un email del dominio autenticado en Brevo
 
-Para más detalles, consulta `README_MAILERLITE.md`.
+**Cómo obtener tu API Key de Brevo (para sincronizar suscriptores):**
+1. Inicia sesión en tu cuenta de Brevo
+2. Ve a **SMTP & API** → **API Keys**
+3. Haz clic en **Generate a new API key**
+4. Asigna un nombre al key (ej: "Blog Subscriptions")
+5. Selecciona los permisos necesarios: **Contacts** (para agregar contactos)
+6. Copia el API key generado y agrégalo a tu `.env` como `BREVO_API_KEY`
+7. (Opcional) Si quieres agregar contactos a una lista específica, ve a **CRM** → **Lists**, copia el ID de la lista y agrégalo como `BREVO_LIST_ID`
 
 3. Ejecuta las migraciones de Prisma:
 

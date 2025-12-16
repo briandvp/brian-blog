@@ -78,6 +78,17 @@ model AuthorizedEmail {
   @@map("authorized_emails")
 }
 
+model Subscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("subscribers")
+}
+
 enum CommentStatus {
   PENDING
   APPROVED

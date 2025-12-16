@@ -153,6 +153,14 @@ const translations: Record<Language, Record<string, string>> = {
     'subscribe.page.faq1.answer': 'Te enviaremos un email cada vez que publiquemos un nuevo artículo, aproximadamente 2-3 veces por semana.',
     'subscribe.page.faq2.question': '¿Puedo cancelar mi suscripción?',
     'subscribe.page.faq2.answer': 'Sí, puedes cancelar tu suscripción en cualquier momento haciendo clic en el enlace de cancelación que aparece en cada email.',
+    'subscribe.modal.title': '¡Suscripción exitosa!',
+    'subscribe.modal.emailSent': 'Hemos enviado un email de confirmación a',
+    'subscribe.modal.description': '¡Bienvenido a nuestra comunidad! Ahora recibirás todas nuestras publicaciones directamente en tu bandeja de entrada.',
+    'subscribe.modal.whatNext': '¿Qué sigue?',
+    'subscribe.modal.step1': 'Revisa tu bandeja de entrada (y spam) para confirmar tu suscripción',
+    'subscribe.modal.step2': 'Recibirás notificaciones cuando publiquemos nuevos artículos',
+    'subscribe.modal.step3': 'Disfruta del contenido exclusivo sobre estoicismo y desarrollo personal',
+    'subscribe.modal.closeButton': 'Entendido',
     
     // Tienda
     'store.title': 'Tienda Estoica',
@@ -365,6 +373,14 @@ const translations: Record<Language, Record<string, string>> = {
     'subscribe.page.faq1.answer': 'We\'ll send you an email every time we publish a new article, approximately 2-3 times per week.',
     'subscribe.page.faq2.question': 'Can I cancel my subscription?',
     'subscribe.page.faq2.answer': 'Yes, you can cancel your subscription at any time by clicking the unsubscribe link in each email.',
+    'subscribe.modal.title': 'Subscription Successful!',
+    'subscribe.modal.emailSent': 'We\'ve sent a confirmation email to',
+    'subscribe.modal.description': 'Welcome to our community! You\'ll now receive all our publications directly in your inbox.',
+    'subscribe.modal.whatNext': 'What\'s next?',
+    'subscribe.modal.step1': 'Check your inbox (and spam) to confirm your subscription',
+    'subscribe.modal.step2': 'You\'ll receive notifications when we publish new articles',
+    'subscribe.modal.step3': 'Enjoy exclusive content about stoicism and personal development',
+    'subscribe.modal.closeButton': 'Got it',
     
     // Store
     'store.title': 'Stoic Store',

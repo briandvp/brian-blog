@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Mail, Loader2 } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
+import { SubscribeSuccessModal } from "@/components/subscribe-success-modal";
 
 interface SubscribeFormProps {
   variant?: "default" | "inline" | "compact";
@@ -16,6 +17,8 @@ export function SubscribeForm({ variant = "default", className = "" }: Subscribe
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [subscribedEmail, setSubscribedEmail] = useState<string>("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,9 +45,14 @@ export function SubscribeForm({ variant = "default", className = "" }: Subscribe
       const data = await response.json();
 
       if (response.ok) {
-        toast.success(t('subscribe.success'));
+        setSubscribedEmail(email);
         setEmail("");
         setName("");
+        // Mostrar el modal después de un pequeño delay para mejor UX
+        setTimeout(() => {
+          setShowSuccessModal(true);
+        }, 100);
+        toast.success(data.message || t('subscribe.success'));
       } else {
         toast.error(data.error || t('subscribe.error'));
       }
@@ -58,7 +66,8 @@ export function SubscribeForm({ variant = "default", className = "" }: Subscribe
 
   if (variant === "inline") {
     return (
-      <form onSubmit={handleSubmit} className={`flex gap-2 ${className}`}>
+      <>
+        <form onSubmit={handleSubmit} className={`flex gap-2 ${className}`}>
         <input
           type="email"
           placeholder={t('subscribe.emailPlaceholder')}
@@ -80,12 +89,19 @@ export function SubscribeForm({ variant = "default", className = "" }: Subscribe
           )}
         </Button>
       </form>
+      <SubscribeSuccessModal
+        open={showSuccessModal}
+        onOpenChange={setShowSuccessModal}
+        email={subscribedEmail}
+      />
+      </>
     );
   }
 
   if (variant === "compact") {
     return (
-      <form onSubmit={handleSubmit} className={`space-y-3 ${className}`}>
+      <>
+        <form onSubmit={handleSubmit} className={`space-y-3 ${className}`}>
         <input
           type="email"
           placeholder={t('subscribe.emailPlaceholder')}
@@ -113,12 +129,19 @@ export function SubscribeForm({ variant = "default", className = "" }: Subscribe
           )}
         </Button>
       </form>
+      <SubscribeSuccessModal
+        open={showSuccessModal}
+        onOpenChange={setShowSuccessModal}
+        email={subscribedEmail}
+      />
+      </>
     );
   }
 
   // Variant default
   return (
-    <form onSubmit={handleSubmit} className={`space-y-4 ${className}`}>
+    <>
+      <form onSubmit={handleSubmit} className={`space-y-4 ${className}`}>
       <div className="space-y-3">
         <input
           type="text"
@@ -157,6 +180,12 @@ export function SubscribeForm({ variant = "default", className = "" }: Subscribe
         )}
       </Button>
     </form>
+    <SubscribeSuccessModal
+      open={showSuccessModal}
+      onOpenChange={setShowSuccessModal}
+      email={subscribedEmail}
+    />
+    </>
   );
 }
 

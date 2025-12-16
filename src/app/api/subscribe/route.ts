@@ -1,4 +1,69 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+
+/**
+ * Agrega un contacto a Brevo usando su API
+ */
+async function addContactToBrevo(email: string, name?: string) {
+  const brevoApiKey = process.env.BREVO_API_KEY;
+  
+  if (!brevoApiKey) {
+    console.warn('BREVO_API_KEY no está configurado. El contacto no se agregará a Brevo.');
+    return null;
+  }
+
+  try {
+    const brevoListId = process.env.BREVO_LIST_ID; // Opcional: ID de lista específica
+    
+    const contactData: any = {
+      email: email.toLowerCase().trim(),
+      updateEnabled: true, // Actualizar si ya existe
+    };
+
+    // Agregar nombre si está disponible
+    if (name) {
+      const nameParts = name.trim().split(' ');
+      if (nameParts.length > 0) {
+        contactData.attributes = {
+          FIRSTNAME: nameParts[0],
+          ...(nameParts.length > 1 && { LASTNAME: nameParts.slice(1).join(' ') }),
+        };
+      }
+    }
+
+    // Agregar a lista específica si está configurada
+    if (brevoListId) {
+      contactData.listIds = [parseInt(brevoListId)];
+    }
+
+    const response = await fetch('https://api.brevo.com/v3/contacts', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'api-key': brevoApiKey,
+      },
+      body: JSON.stringify(contactData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      // Si el contacto ya existe (código 400 con mensaje específico), no es un error crítico
+      if (response.status === 400 && errorData.message?.includes('already exists')) {
+        console.log(`Contacto ${email} ya existe en Brevo`);
+        return { success: true, alreadyExists: true };
+      }
+      console.error('Error agregando contacto a Brevo:', errorData);
+      return null;
+    }
+
+    const data = await response.json();
+    console.log(`Contacto ${email} agregado exitosamente a Brevo`);
+    return { success: true, data };
+  } catch (error) {
+    console.error('Error al agregar contacto a Brevo:', error);
+    return null;
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,67 +77,71 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Obtener el API token de MailerLite desde las variables de entorno
-    const mailerliteApiToken = process.env.MAILERLITE_API_TOKEN;
-    const mailerliteGroupId = process.env.MAILERLITE_GROUP_ID;
-
-    if (!mailerliteApiToken) {
-      console.error('MAILERLITE_API_TOKEN no está configurado');
+    // Validar formato de email básico
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
       return NextResponse.json(
-        { error: 'Servicio de suscripción no configurado' },
-        { status: 500 }
+        { error: 'Email inválido' },
+        { status: 400 }
       );
     }
 
-    // Preparar los datos del suscriptor
-    const subscriberData: any = {
-      email,
-      status: 'active',
-    };
+    try {
+      // Intentar crear el suscriptor en la base de datos
+      const subscriber = await prisma.subscriber.create({
+        data: {
+          email: email.toLowerCase().trim(),
+          name: name?.trim() || null,
+          active: true,
+        },
+      });
 
-    if (name) {
-      subscriberData.name = name;
-    }
+      // Intentar agregar a Brevo (no bloquea si falla)
+      addContactToBrevo(email, name).catch(err => {
+        console.error('Error no crítico al agregar a Brevo:', err);
+      });
 
-    // Si hay un group ID, agregarlo
-    if (mailerliteGroupId) {
-      subscriberData.groups = [mailerliteGroupId];
-    }
+      return NextResponse.json(
+        { message: 'Suscripción exitosa', data: subscriber },
+        { status: 200 }
+      );
+    } catch (error: any) {
+      // Si el suscriptor ya existe (error de unique constraint)
+      if (error.code === 'P2002') {
+        // Verificar si el suscriptor está activo
+        const existingSubscriber = await prisma.subscriber.findUnique({
+          where: { email: email.toLowerCase().trim() },
+        });
 
-    // Hacer la petición a la API de MailerLite v2
-    const mailerliteResponse = await fetch('https://connect.mailerlite.com/api/subscribers', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${mailerliteApiToken}`,
-        'Accept': 'application/json',
-        'X-MailerLite-ApiDocs': 'true',
-      },
-      body: JSON.stringify(subscriberData),
-    });
+        if (existingSubscriber?.active) {
+          return NextResponse.json(
+            { message: 'Ya estás suscrito a nuestra lista', success: true },
+            { status: 200 }
+          );
+        } else {
+          // Reactivar el suscriptor si estaba inactivo
+          const reactivatedSubscriber = await prisma.subscriber.update({
+            where: { email: email.toLowerCase().trim() },
+            data: {
+              active: true,
+              name: name?.trim() || existingSubscriber.name,
+            },
+          });
 
-    const mailerliteData = await mailerliteResponse.json();
+          // Intentar agregar a Brevo (no bloquea si falla)
+          addContactToBrevo(email, name || existingSubscriber.name || undefined).catch(err => {
+            console.error('Error no crítico al agregar a Brevo:', err);
+          });
 
-    if (!mailerliteResponse.ok) {
-      // Si el suscriptor ya existe, no es un error crítico
-      if (mailerliteResponse.status === 422 || mailerliteData.message?.includes('already exists')) {
-        return NextResponse.json(
-          { message: 'Ya estás suscrito a nuestra lista', success: true },
-          { status: 200 }
-        );
+          return NextResponse.json(
+            { message: 'Suscripción reactivada exitosamente', data: reactivatedSubscriber },
+            { status: 200 }
+          );
+        }
       }
 
-      console.error('Error de MailerLite:', mailerliteData);
-      return NextResponse.json(
-        { error: mailerliteData.message || 'Error al suscribirse' },
-        { status: mailerliteResponse.status }
-      );
+      throw error;
     }
-
-    return NextResponse.json(
-      { message: 'Suscripción exitosa', data: mailerliteData },
-      { status: 200 }
-    );
   } catch (error) {
     console.error('Error en la suscripción:', error);
     return NextResponse.json(

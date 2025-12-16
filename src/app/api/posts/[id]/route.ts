@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { notifySubscribersAboutNewPost } from '@/lib/mailerlite-notifications';
+import { notifySubscribersAboutNewPost } from '@/lib/smtp-notifications';
 
 // GET /api/posts/[id] - Obtener un post específico por ID
 export async function GET(

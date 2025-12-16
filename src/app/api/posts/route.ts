@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { notifySubscribersAboutNewPost } from '@/lib/mailerlite-notifications';
+import { notifySubscribersAboutNewPost } from '@/lib/smtp-notifications';
 
 // GET /api/posts - Obtener todos los posts
 export async function GET(request: NextRequest) {
