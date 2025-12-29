@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
 
     // Construir filtros para Prisma
     const where: any = {};
-    
+
     if (status === 'published') {
       where.published = true;
     } else if (status === 'draft') {
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
 
     // Obtener posts con paginación
     const skip = (page - 1) * limit;
-    
+
     const [posts, totalCount] = await Promise.all([
       prisma.post.findMany({
         where,
@@ -200,7 +200,7 @@ export async function POST(request: NextRequest) {
         }
       }).then(result => {
         if (result.success) {
-          console.log('Subscribers notified successfully:', result.campaignId);
+          console.log('Subscribers notified successfully:', 'sent' in result ? `${result.sent}/${result.total}` : result.message);
         } else {
           console.error('Error notifying subscribers:', result.error);
         }

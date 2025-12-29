@@ -168,7 +168,7 @@ export async function PUT(
         }
       }).then(result => {
         if (result.success) {
-          console.log('Subscribers notified successfully:', result.campaignId);
+          console.log('Subscribers notified successfully:', 'sent' in result ? `${result.sent}/${result.total}` : result.message);
         } else {
           console.error('Error notifying subscribers:', result.error);
         }

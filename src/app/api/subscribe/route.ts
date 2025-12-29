@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma';
  */
 async function addContactToBrevo(email: string, name?: string) {
   const brevoApiKey = process.env.BREVO_API_KEY;
-  
+
   if (!brevoApiKey) {
     console.warn('BREVO_API_KEY no está configurado. El contacto no se agregará a Brevo.');
     return null;
@@ -14,7 +14,7 @@ async function addContactToBrevo(email: string, name?: string) {
 
   try {
     const brevoListId = process.env.BREVO_LIST_ID; // Opcional: ID de lista específica
-    
+
     const contactData: any = {
       email: email.toLowerCase().trim(),
       updateEnabled: true, // Actualizar si ya existe
@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
             { message: 'Ya estás suscrito a nuestra lista', success: true },
             { status: 200 }
           );
-        } else {
+        } else if (existingSubscriber) {
           // Reactivar el suscriptor si estaba inactivo
           const reactivatedSubscriber = await prisma.subscriber.update({
             where: { email: email.toLowerCase().trim() },
@@ -137,6 +137,9 @@ export async function POST(request: NextRequest) {
             { message: 'Suscripción reactivada exitosamente', data: reactivatedSubscriber },
             { status: 200 }
           );
+        } else {
+          // Subscriber not found (shouldn't happen after P2002 error)
+          throw new Error('Subscriber not found after unique constraint violation');
         }
       }
 
