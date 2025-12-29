@@ -95,3 +95,19 @@ enum CommentStatus {
   REJECTED
   SPAM
 }
+
+model HomeComment {
+  id        String        @id @default(cuid())
+  content   String
+  author    String
+  email     String
+  status    CommentStatus @default(APPROVED)
+  isReply   Boolean       @default(false)
+  parentId  String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  parent    HomeComment?  @relation("HomeCommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   HomeComment[] @relation("HomeCommentReplies")
+
+  @@map("home_comments")
+}
