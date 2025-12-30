@@ -5,6 +5,9 @@ export async function GET(req: NextRequest) {
   try {
     // Total de vistas, visitantes y comentarios
     const posts = await prisma.post.findMany({
+      where: {
+        published: true
+      },
       select: {
         id: true,
         title: true,
@@ -14,6 +17,7 @@ export async function GET(req: NextRequest) {
           select: { id: true },
         },
         createdAt: true,
+        published: true,
       },
     });
 
@@ -57,8 +61,9 @@ export async function GET(req: NextRequest) {
       comment => new Date(comment.createdAt) >= firstDayOfMonth
     );
 
-    // Vistas este mes
-    const viewsThisMonth = postsThisMonth.reduce((sum, post) => sum + post.views, 0);
+    // Vistas este mes - usar TODAS las vistas de los posts publicados
+    // (no solo de los creados este mes, porque las vistas pueden venir de posts antiguos)
+    const viewsThisMonth = totalViews;
 
     // Últimos 30 días de datos por día
     const monthlyData: Record<string, { views: number; posts: number; comments: number }> = {};
@@ -69,6 +74,7 @@ export async function GET(req: NextRequest) {
       monthlyData[dateStr] = { views: 0, posts: 0, comments: 0 };
     }
 
+    // Distribuir vistas proporcionalmente por día de creación del post
     posts.forEach(post => {
       const dateStr = new Date(post.createdAt).toISOString().split('T')[0];
       if (monthlyData[dateStr]) {
@@ -98,7 +104,7 @@ export async function GET(req: NextRequest) {
       },
       monthlyStats: {
         views: viewsThisMonth,
-        posts: postsThisMonth.length,
+        posts: posts.length, // Total de posts publicados
         comments: commentsThisMonth.length,
       },
       topPosts,
