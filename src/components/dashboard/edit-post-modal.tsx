@@ -23,7 +23,7 @@ export function EditPostModal({ post, onClose, onSubmit }: EditPostModalProps) {
   const categories = [
     "General",
     "Citas estoicas",
-    "Entrevistas", 
+    "Entrevistas",
     "Principios estoicos",
     "Psicología estoica"
   ];
@@ -42,6 +42,9 @@ export function EditPostModal({ post, onClose, onSubmit }: EditPostModalProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('=== SUBMIT DEBUG ===');
+    console.log('formData:', formData);
+    console.log('formData.content length:', formData.content?.length);
     onSubmit({ ...post, ...formData });
   };
 
@@ -57,7 +60,7 @@ export function EditPostModal({ post, onClose, onSubmit }: EditPostModalProps) {
   };
 
   return (
-    <div 
+    <div
       className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
     >
       <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[95vh] flex flex-col overflow-hidden">

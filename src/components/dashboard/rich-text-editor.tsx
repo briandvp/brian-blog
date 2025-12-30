@@ -116,6 +116,8 @@ export function RichTextEditor({ content, onChange, placeholder = "Escribe aquí
   const [uploading, setUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const isInternalChange = useRef(false);
+  const lastExternalContent = useRef(content);
 
   useEffect(() => {
     setMounted(true);
@@ -158,7 +160,13 @@ export function RichTextEditor({ content, onChange, placeholder = "Escribe aquí
     ],
     content,
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
+      isInternalChange.current = true;
+      const html = editor.getHTML();
+      onChange(html);
+      // Reset after a tick to allow parent state to update
+      setTimeout(() => {
+        isInternalChange.current = false;
+      }, 0);
     },
     editorProps: {
       attributes: {
@@ -168,9 +176,13 @@ export function RichTextEditor({ content, onChange, placeholder = "Escribe aquí
     immediatelyRender: false,
   });
 
+  // Only sync external content changes (not user edits)
   useEffect(() => {
-    if (editor && content !== editor.getHTML()) {
-      editor.commands.setContent(content);
+    if (editor && !isInternalChange.current && content !== lastExternalContent.current) {
+      lastExternalContent.current = content;
+      if (content !== editor.getHTML()) {
+        editor.commands.setContent(content);
+      }
     }
   }, [content, editor]);
 
