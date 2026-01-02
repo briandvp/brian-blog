@@ -29,7 +29,7 @@ export default function PostPage() {
   const params = useParams();
   const { t, language } = useLanguage();
   const postId = params.id as string;
-  
+
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -60,25 +60,25 @@ export default function PostPage() {
     const fetchPost = async () => {
       try {
         setLoading(true);
-        
+
         // Solo incrementar vistas si es la primera carga y no se ha visto en esta sesión
         const shouldIncrement = isInitialLoadRef.current && !hasViewedInSession();
-        
+
         console.log('Fetching post with ID:', postId, 'Language:', language, 'Increment views:', shouldIncrement);
-        
+
         const response = await fetch(`/api/posts/${postId}?lang=${language}&incrementViews=${shouldIncrement}`);
         console.log('Response status:', response.status);
-        
+
         if (response.ok) {
           const data = await response.json();
           console.log('Post data received:', data);
           setPost(data.post);
-          
+
           if (shouldIncrement) {
             hasIncrementedViewsRef.current = true;
             markAsViewed();
           }
-          
+
           isInitialLoadRef.current = false;
         } else {
           const errorData = await response.json();
@@ -105,7 +105,7 @@ export default function PostPage() {
       try {
         console.log('Reloading post content for language:', language);
         const response = await fetch(`/api/posts/${postId}?lang=${language}&incrementViews=false`);
-        
+
         if (response.ok) {
           const data = await response.json();
           setPost(data.post);
@@ -167,7 +167,7 @@ export default function PostPage() {
               <p className="text-gray-600 mb-6">
                 {t('article.postDeleted')}
               </p>
-              <Link 
+              <Link
                 href="/blog"
                 className="inline-flex items-center gap-2 bg-[#D4AF37] text-white px-6 py-3 rounded-lg hover:bg-[#B8941F] transition-colors"
               >
@@ -186,7 +186,7 @@ export default function PostPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Botón de regreso */}
-          <Link 
+          <Link
             href="/blog"
             className="inline-flex items-center gap-2 text-[#D4AF37] hover:text-[#B8941F] transition-colors mb-6"
           >
@@ -238,7 +238,7 @@ export default function PostPage() {
             {/* Contenido del post */}
             <div className="p-8">
               <div className="prose prose-lg max-w-none">
-                <div 
+                <div
                   className="article-content text-gray-700 leading-relaxed"
                   dangerouslySetInnerHTML={{ __html: post.content }}
                 />
@@ -259,9 +259,9 @@ export default function PostPage() {
                     <p className="text-sm text-gray-600">{t('article.author')}</p>
                   </div>
                 </div>
-                
+
                 <div className="flex gap-3">
-                  <Link 
+                  <Link
                     href="/blog"
                     className="inline-flex items-center gap-2 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
                   >
