@@ -4,10 +4,10 @@ import { prisma } from '@/lib/prisma';
 // PUT /api/home-comments/[id] - Actualizar un home comment
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     const { status } = body;
 
@@ -42,10 +42,10 @@ export async function PUT(
 // DELETE /api/home-comments/[id] - Eliminar un home comment
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     // Eliminar también las respuestas asociadas
     await prisma.homeComment.deleteMany({
