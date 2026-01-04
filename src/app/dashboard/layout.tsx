@@ -13,13 +13,18 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { t } = useLanguage();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const checkAuth = async () => {
+      // Esperar a que el AuthContext termine de cargar
+      if (authLoading) {
+        return;
+      }
+
       // Si el usuario no está autenticado
       if (!user) {
         toast.error(t('dashboard.layout.loginRequired'));
@@ -40,7 +45,7 @@ export default function DashboardLayout({
 
     // Ejecutar la verificación de autenticación
     checkAuth();
-  }, [user, router]);
+  }, [user, authLoading, router, t]);
 
   if (isLoading) {
     return (
