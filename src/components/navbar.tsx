@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, Home, BookOpen, ShoppingBag, User, Settings, LogIn, LogOut, Plus } from "lucide-react";
 import Image from "next/image";
 import { useAuth } from "@/contexts/auth-context";
@@ -129,8 +129,8 @@ export function Navbar() {
               <SheetContent 
                 side="right" 
                 className="w-[320px] sm:w-[400px] p-0 bg-gradient-to-br from-[#42403e] to-[#36312f] border-l border-gray-600"
-                aria-label="Menú de navegación móvil"
               >
+                <SheetTitle className="sr-only">Menú de navegación móvil</SheetTitle>
                 <MobileSidebar />
               </SheetContent>
             </Sheet>
