@@ -31,6 +31,7 @@ model Post {
   title        String
   content      String
   excerpt      String?
+  featuredImage String?
   category     String    @default("General")
   // Campos en inglés (opcionales)
   titleEn      String?

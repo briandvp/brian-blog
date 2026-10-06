@@ -9,6 +9,7 @@ interface PostCardProps {
     title: string;
     excerpt: string;
     category: string;
+    featuredImage?: string | null;
     status: string;
     author: {
       id: string;
@@ -46,6 +47,13 @@ export function PostCard({ post, onEdit, onDelete }: PostCardProps) {
 
   return (
     <div className="bg-white rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow duration-200">
+      {post.featuredImage && (
+        <img
+          src={post.featuredImage}
+          alt=""
+          className="w-full h-40 object-cover"
+        />
+      )}
       <div className="p-6">
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
@@ -126,4 +134,3 @@ export function PostCard({ post, onEdit, onDelete }: PostCardProps) {
     </div>
   );
 }
-

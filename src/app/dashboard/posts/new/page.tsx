@@ -39,6 +39,25 @@ export default function NewPost() {
     }));
   };
 
+  const handleImageUpload = async (file: File | undefined) => {
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await fetch("/api/upload", { method: "POST", body: formData });
+      const data = await response.json();
+      if (!response.ok) {
+        alert(data.error || "Error al subir la imagen");
+        return;
+      }
+      handleInputChange("featuredImage", data.url);
+    } catch (error) {
+      console.error("Error uploading featured image:", error);
+      alert("Error al subir la imagen");
+    }
+  };
+
   const handleSave = async (status: string) => {
     setIsSaving(true);
     
@@ -295,6 +314,16 @@ export default function NewPost() {
                   placeholder="https://ejemplo.com/imagen.jpg"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#42403e] focus:border-transparent"
                 />
+                <label className="inline-flex items-center gap-2 mt-3 px-3 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                  <Image className="h-4 w-4" />
+                  Subir imagen desde el equipo
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
+                    className="sr-only"
+                    onChange={(e) => handleImageUpload(e.target.files?.[0])}
+                  />
+                </label>
                 {post.featuredImage && (
                   <div className="mt-4">
                     <img 

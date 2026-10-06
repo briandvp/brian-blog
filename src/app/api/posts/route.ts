@@ -57,16 +57,32 @@ export async function GET(request: NextRequest) {
       prisma.post.count({ where })
     ]);
 
+    // Conteo real de comentarios aprobados (incluye respuestas) por post
+    const approvedCounts = posts.length > 0
+      ? await prisma.comment.groupBy({
+          by: ['postId'],
+          where: {
+            postId: { in: posts.map(post => post.id) },
+            status: 'APPROVED'
+          },
+          _count: { _all: true }
+        })
+      : [];
+    const commentCountByPost = new Map<string, number>(
+      approvedCounts.map(count => [count.postId, count._count._all])
+    );
+
     // Transformar datos para mantener compatibilidad con el frontend
     const transformedPosts = posts.map(post => ({
       id: post.id,
       title: post.title,
       content: post.content,
       excerpt: post.excerpt || post.content.substring(0, 150) + '...',
+      featuredImage: post.featuredImage,
       category: post.category,
       status: post.published ? 'published' : 'draft',
       views: post.views,
-      comments: post.comments,
+      comments: commentCountByPost.get(post.id) ?? 0,
       author: {
         id: post.author.id,
         name: post.author.name || 'Autor',
@@ -117,7 +133,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { title, content, excerpt, category, status = 'draft', titleEn, contentEn, excerptEn, categoryEn } = body;
+    const { title, content, excerpt, category, featuredImage, status = 'draft', titleEn, contentEn, excerptEn, categoryEn } = body;
 
     console.log('Creating new post:', { title, status, category });
 
@@ -144,6 +160,7 @@ export async function POST(request: NextRequest) {
         title,
         content,
         excerpt: excerpt || content.substring(0, 150) + '...',
+        featuredImage: featuredImage || null,
         category: category || 'General',
         titleEn: titleEn || null,
         contentEn: contentEn || null,
@@ -169,6 +186,7 @@ export async function POST(request: NextRequest) {
       title: newPost.title,
       content: newPost.content,
       excerpt: newPost.excerpt || newPost.content.substring(0, 150) + '...',
+      featuredImage: newPost.featuredImage,
       category: newPost.category,
       status: newPost.published ? 'published' : 'draft',
       views: newPost.views,

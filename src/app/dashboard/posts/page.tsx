@@ -14,6 +14,7 @@ interface Post {
   content: string;
   excerpt: string;
   category: string;
+  featuredImage?: string | null;
   status: string;
   views: number;
   comments: number;
@@ -279,5 +280,4 @@ export default function PostsPage() {
     </div>
   );
 }
-
 

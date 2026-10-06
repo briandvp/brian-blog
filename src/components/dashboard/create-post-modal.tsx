@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { X, Save, Eye } from "lucide-react";
+import { X, Save, Eye, Image as ImageIcon } from "lucide-react";
 import { RichTextEditor } from "./rich-text-editor";
 
 interface CreatePostModalProps {
@@ -16,6 +16,7 @@ export function CreatePostModal({ onClose, onSubmit }: CreatePostModalProps) {
     excerpt: "",
     content: "",
     category: "General",
+    featuredImage: "",
     status: "draft"
   });
 
@@ -34,6 +35,19 @@ export function CreatePostModal({ onClose, onSubmit }: CreatePostModalProps) {
 
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleImageChange = async (file: File | undefined) => {
+    if (!file) return;
+    const uploadData = new FormData();
+    uploadData.append("file", file);
+    const response = await fetch("/api/upload", { method: "POST", body: uploadData });
+    const data = await response.json();
+    if (!response.ok) {
+      alert(data.error || "Error al subir la imagen");
+      return;
+    }
+    handleChange("featuredImage", data.url);
   };
 
   return (
@@ -122,6 +136,29 @@ export function CreatePostModal({ onClose, onSubmit }: CreatePostModalProps) {
               />
             </div>
 
+            {/* Featured image */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Miniatura de la publicación
+              </label>
+              <div className="flex items-center gap-3">
+                <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-50">
+                  <ImageIcon className="h-4 w-4" />
+                  Seleccionar imagen
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
+                    className="sr-only"
+                    onChange={(e) => handleImageChange(e.target.files?.[0])}
+                  />
+                </label>
+                {formData.featuredImage && (
+                  <img src={formData.featuredImage} alt="Vista previa de la miniatura" className="h-16 w-24 rounded object-cover border" />
+                )}
+              </div>
+              <p className="text-xs text-gray-500 mt-2">JPG, PNG, GIF, WebP o SVG. Máximo 5 MB.</p>
+            </div>
+
             {/* Content */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -174,4 +211,3 @@ export function CreatePostModal({ onClose, onSubmit }: CreatePostModalProps) {
     </div>
   );
 }
-

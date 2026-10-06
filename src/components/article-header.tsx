@@ -2,11 +2,41 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import { useLanguage } from "@/contexts/language-context";
 import { CalendarIcon, MessageSquare, User2, BookOpen } from "lucide-react";
 
 export function ArticleHeader() {
   const { t } = useLanguage();
+  const [commentCount, setCommentCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchCommentCount = async () => {
+      try {
+        const response = await fetch('/api/home-comments?status=approved');
+        if (response.ok) {
+          const data = await response.json();
+          setCommentCount(
+            Array.isArray(data)
+              ? data.reduce(
+                  (sum: number, comment: { replies?: unknown[] }) =>
+                    sum + 1 + (Array.isArray(comment.replies) ? comment.replies.length : 0),
+                  0
+                )
+              : 0
+          );
+        }
+      } catch (error) {
+        console.error('Error loading home comment count:', error);
+      }
+    };
+
+    fetchCommentCount();
+    const handleCommentsChanged = () => fetchCommentCount();
+    window.addEventListener('home-comments-changed', handleCommentsChanged);
+    return () => window.removeEventListener('home-comments-changed', handleCommentsChanged);
+  }, []);
+
   return (
     <div className="mb-12">
       <div className="relative mb-10">
@@ -17,9 +47,9 @@ export function ArticleHeader() {
         <div className="flex flex-wrap items-center justify-center gap-4 mb-8 text-sm relative z-10">
           <Link
             href="/categoria/principios-estoicos"
-            className="group bg-gradient-to-r from-[#42403e] to-[#36312f] text-white px-4 py-2 rounded-full hover:from-gold hover:to-amber-600 transition-all duration-300 flex items-center gap-2 shadow-md hover:shadow-lg hover:scale-105"
+            className="bg-[#42403e] text-white px-4 py-2 rounded-full flex items-center gap-2 shadow-md"
           >
-            <BookOpen className="h-4 w-4 group-hover:rotate-12 transition-transform" />
+            <BookOpen className="h-4 w-4" />
             <span className="font-medium">{t('article.principles')}</span>
           </Link>
           <div className="flex items-center text-gray-600 gap-2 px-3 py-2 rounded-full bg-gray-50 hover:bg-gray-100 transition-colors">
@@ -38,7 +68,7 @@ export function ArticleHeader() {
             className="flex items-center text-gray-600 gap-2 px-3 py-2 rounded-full bg-gray-50 hover:bg-gray-100 hover:text-gold transition-all group"
           >
             <MessageSquare className="h-4 w-4 text-gold group-hover:scale-110 transition-transform" />
-            <span className="font-medium">10 {t('article.commentsLabel')}</span>
+            <span className="font-medium">{commentCount ?? 0} {t('article.commentsLabel')}</span>
           </Link>
         </div>
       </div>

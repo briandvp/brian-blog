@@ -251,6 +251,15 @@
   line-height: 1.8;
 }
 
+.article-content h1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-top: 2.5rem;
+  margin-bottom: 1.25rem;
+  color: #111827;
+}
+
 .article-content h2 {
   font-size: 1.875rem;
   font-weight: 700;

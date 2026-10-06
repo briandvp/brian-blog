@@ -52,16 +52,22 @@ export async function GET(
     const excerpt = useEnglish && post.excerptEn ? post.excerptEn : (post.excerpt || post.content.substring(0, 150) + '...');
     const category = useEnglish && post.categoryEn ? post.categoryEn : post.category;
 
+    // Conteo real de comentarios aprobados (incluye respuestas)
+    const commentCount = await prisma.comment.count({
+      where: { postId, status: 'APPROVED' }
+    });
+
     // Transformar para mantener compatibilidad con el frontend
     const transformedPost = {
       id: post.id,
       title,
       content,
       excerpt,
+      featuredImage: post.featuredImage,
       category,
       status: post.published ? 'published' : 'draft',
       views: incrementViews ? post.views + 1 : post.views, // Incluir la vista incrementada solo si se incrementó
-      comments: post.comments,
+      comments: commentCount,
       author: {
         id: post.author.id,
         name: post.author.name || 'Autor',
@@ -94,7 +100,7 @@ export async function PUT(
   try {
     const { id: postId } = await params;
     const body = await request.json();
-    const { title, content, excerpt, category, status } = body;
+    const { title, content, excerpt, category, featuredImage, status } = body;
 
     console.log('Updating post with ID:', postId);
     console.log('Update data:', { title, status, category });
@@ -134,6 +140,7 @@ export async function PUT(
         ...(title && { title }),
         ...(content && { content }),
         ...(excerpt && { excerpt }),
+        ...(featuredImage !== undefined && { featuredImage: featuredImage || null }),
         ...(category && { category }),
         ...(titleEn !== undefined && { titleEn }),
         ...(contentEn !== undefined && { contentEn }),
@@ -183,10 +190,11 @@ export async function PUT(
       title: updatedPost.title,
       content: updatedPost.content,
       excerpt: updatedPost.excerpt || updatedPost.content.substring(0, 150) + '...',
+      featuredImage: updatedPost.featuredImage,
       category: updatedPost.category,
       status: updatedPost.published ? 'published' : 'draft',
       views: updatedPost.views,
-      comments: updatedPost.comments,
+      comments: await prisma.comment.count({ where: { postId, status: 'APPROVED' } }),
       author: {
         id: updatedPost.author.id,
         name: updatedPost.author.name || 'Autor',

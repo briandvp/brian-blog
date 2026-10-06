@@ -165,6 +165,7 @@ export function HomeArticleComments() {
 
                 setReplyingTo(null);
                 toast.success('¡Comentario publicado!');
+                window.dispatchEvent(new CustomEvent('home-comments-changed'));
             } else {
                 const error = await response.json();
                 toast.error(error.error || 'Error al enviar el comentario');
@@ -193,7 +194,7 @@ export function HomeArticleComments() {
 
             <div className="mb-10">
                 <h3 className="text-xl font-lora font-bold mb-6">
-                    Comentarios ({comments.length})
+                    Comentarios ({comments.reduce((total, comment) => total + 1 + (comment.replies?.length || 0), 0)})
                 </h3>
 
                 {loading ? (
@@ -331,7 +332,7 @@ export function HomeArticleComments() {
                         <button
                             type="submit"
                             disabled={submitting}
-                            className="w-full sm:w-auto bg-[#D4AF37] hover:bg-[#B8941F] disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold py-3 px-8 rounded-md shadow-lg hover:shadow-xl transition-all duration-300 text-base cursor-pointer border-none outline-none focus:ring-2 focus:ring-[#D4AF37] focus:ring-offset-2"
+                            className="w-full sm:w-auto bg-[#42403e] hover:bg-[#36312f] disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold py-3 px-8 rounded-md shadow-lg hover:shadow-xl transition-all duration-300 text-base cursor-pointer border-none outline-none focus:ring-2 focus:ring-[#42403e] focus:ring-offset-2"
                         >
                             {submitting ? 'Enviando...' : 'Publicar comentario'}
                         </button>

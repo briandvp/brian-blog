@@ -23,6 +23,7 @@ interface Post {
   content: string;
   excerpt: string;
   category: string;
+  featuredImage?: string | null;
   status: string;
   views: number;
   comments: number;
@@ -206,11 +207,18 @@ export default function BlogPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredAndSortedPosts.map((post) => (
               <article key={post.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                {post.featuredImage && (
+                  <img
+                    src={post.featuredImage}
+                    alt=""
+                    className="w-full h-48 object-cover"
+                  />
+                )}
                 <div className="p-6">
                   {/* Categoría */}
                   <div className="flex items-center gap-2 mb-3">
                     <Tag className="h-4 w-4 text-[#42403e]" />
-                    <span className="text-sm font-medium text-[#42403e] bg-[#42403e]/10 px-2 py-1 rounded-full">
+                    <span className="text-sm font-medium text-white bg-[#42403e] px-2 py-1 rounded-full">
                       {post.category}
                     </span>
                   </div>

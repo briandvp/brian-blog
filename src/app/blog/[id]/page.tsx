@@ -13,6 +13,7 @@ interface Post {
   content: string;
   excerpt: string;
   category: string;
+  featuredImage?: string | null;
   status: string;
   views: number;
   comments: number;
@@ -198,9 +199,16 @@ export default function PostPage() {
           <article className="bg-white rounded-lg shadow-lg overflow-hidden">
             {/* Header del post */}
             <div className="p-8 border-b border-gray-200">
+              {post.featuredImage && (
+                <img
+                  src={post.featuredImage}
+                  alt=""
+                  className="w-full h-64 object-cover rounded-lg mb-6"
+                />
+              )}
               {/* Categoría */}
               <div className="mb-4">
-                <span className="inline-block bg-[#D4AF37] text-white text-sm font-medium px-3 py-1 rounded-full">
+                <span className="inline-block bg-[#42403e] text-white text-sm font-medium px-3 py-1 rounded-full">
                   {post.category}
                 </span>
               </div>
@@ -268,7 +276,7 @@ export default function PostPage() {
                     <ArrowLeft className="h-4 w-4" />
                     {t('article.morePosts')}
                   </Link>
-                  <button className="inline-flex items-center gap-2 bg-[#D4AF37] text-white px-4 py-2 rounded-lg hover:bg-[#B8941F] transition-colors">
+                  <button className="inline-flex items-center gap-2 bg-[#42403e] text-white px-4 py-2 rounded-lg hover:bg-[#36312f] transition-colors">
                     <MessageCircle className="h-4 w-4" />
                     {t('article.comment')}
                   </button>
